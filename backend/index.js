@@ -30,8 +30,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  const ua = req.headers["user-agent"] || "";
-  if (ua.includes("Opera Mini")) {
+  const ua     = req.headers["user-agent"] || "";
+  const opera  = req.headers["x-operamini-phone-ua"];
+  const accept = req.headers["x-requested-with"];
+
+  const isOperaMini = ua.includes("Opera Mini") || opera || accept === "com.opera.mini.native";
+
+  if (isOperaMini) {
     return res.redirect("/games-opera");
   }
 

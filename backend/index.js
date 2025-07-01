@@ -29,7 +29,48 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
+app.get("/", (req, res) => {
+  const ua = req.headers["user-agent"] || "";
+  if (ua.includes("Opera Mini")) {
+    return res.redirect("/games-opera");
+  }
+
+  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+});
+
 app.get("/games", (_req, res) => res.json(games));
+
+app.get("/games-opera", (req, res) => {
+  const list = games.map(g => `
+    <li>
+      <b>${g.title}</b> (${g.year})<br>
+      <a href="/download/${g.id}">Unduh (${(g.size / 1024).toFixed(1)} KB)</a>
+    </li>
+  `).join("");
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Daftar Game Java</title>
+      <meta charset="utf-8">
+      <style>
+        body { background:black; color:white; font-family:sans-serif; padding:10px; }
+        a { color: #0ff }
+      </style>
+    </head>
+    <body>
+      <h2>📱 Game Java J2ME</h2>
+      <p>Kompatibel dengan Opera Mini</p>
+      <ul>${list}</ul>
+      <hr>
+      <small>&copy; 2025 java.repp.my.id</small>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
 
 app.get("/download/:id", async (req, res) => {
   const game = games.find(g => g.id === req.params.id);

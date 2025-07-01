@@ -25,8 +25,6 @@ const FRONTEND_PATH = path.join(__dirname, "..", "frontend");
 // layani frontend static dari folder /frontend
 app.use(express.static(FRONTEND_PATH));
 
-app.get("/api/games", (_req, res) => res.json(games));
-
 // fallback: kalau user buka '/', tampilkan index.html dari /frontend
 app.get("/", (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "index.html"));
@@ -46,10 +44,11 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
+app.get("/url/games", (_req, res) => res.json(games));
+
 app.get("/games", (_req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "games.html"));
 });
-
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 

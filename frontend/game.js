@@ -1,7 +1,7 @@
 const id = new URLSearchParams(location.search).get("id");
 const container = document.getElementById("game-detail");
 
-fetch("/api/games")
+fetch("/url/games")
   .then((r) => r.json())
   .then((data) => {
     const g = data.find((x) => x.id === id);

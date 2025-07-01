@@ -1,13 +1,20 @@
 const id = new URLSearchParams(location.search).get("id");
 const container = document.getElementById("game-detail");
 
+if (!id || !container) {
+  console.error("❌ ID game atau elemen container tidak ditemukan");
+}
+
 fetch("/games")
   .then((r) => r.json())
   .then((data) => {
     const g = data.find((x) => x.id === id);
-    if (!g) return (container.innerHTML = "❌ Game tidak ditemukan");
+    if (!g) {
+      container.innerHTML = "❌ Game tidak ditemukan";
+      return;
+    }
 
-    // Cover + detail
+    // Tampilkan detail game + unduhan
     container.innerHTML = `
       <div class="game-box">
         <img class="cover" src="${g.cover}" alt="Cover ${g.name}" />
@@ -31,31 +38,52 @@ fetch("/games")
 
       <p style="margin-top:12px;">
         <a class="dl-btn" href="/download/${g.id}">
-          ⬇️ Unduh (${(g.size/1024).toFixed(1)} KB)
+          ⬇️ Unduh (${(g.size / 1024).toFixed(1)} KB)
         </a>
       </p>
     `;
 
-    // isi track
-    const track = document.getElementById("track");
-    g.screenshots.forEach((src) => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.onclick = () => window.open(src, "_blank"); // zoom / download
-      track.appendChild(img);
-    });
+    // Ambil screenshot dari backend
+    fetch(`/screenshots-list/${g.folderSlug}`)
+    .then((r) => r.json())
+    .then((result) => {
+      
+      const track = document.getElementById("track");
+      if (!Array.isArray(result) || result.length === 0) {
+        track.innerHTML = "<p style='color:white'>Tidak ada screenshot tersedia.</p>";
+        return;
+      }
+      
+      result.forEach((key) => {
+         console.log("Menambahkan screenshot:", key);
+        const img = document.createElement("img");
+        img.src = `/screenshot/${key}`;
+        img.alt = "Screenshot";
+        img.onclick = () => window.open(img.src, "_blank");
+        track.appendChild(img);
+      });
 
-    // Carousel control
+    // Carousel
     let idx = 0;
     const scrollTo = () =>
       track.scrollTo({ left: idx * 160, behavior: "smooth" });
-
     document.getElementById("prevBtn").onclick = () => {
       idx = Math.max(idx - 1, 0);
       scrollTo();
     };
     document.getElementById("nextBtn").onclick = () => {
-      idx = Math.min(idx + 1, g.screenshots.length - 1);
+      idx = Math.min(idx + 1, result.length - 1);
       scrollTo();
     };
+  })
+  .catch((err) => {
+    console.error("❌ Gagal memuat screenshot:", err);
+    document.getElementById("track").innerHTML =
+      "<p style='color:white'>Gagal memuat screenshot.</p>";
+  });
+
+  })
+  .catch((err) => {
+    console.error("❌ Gagal memuat detail game:", err);
+    container.innerHTML = "❌ Tidak dapat memuat data game.";
   });

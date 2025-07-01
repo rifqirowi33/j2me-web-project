@@ -9,7 +9,7 @@ const __dirname  = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "config.env") });
 
 import express from "express";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createS3Client } from "./r2client.js";
 import { games } from "./games.js";
 
@@ -31,25 +31,6 @@ app.get("/games", (_req, res) => res.json(games));
 app.get("/", (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
-
-app.get("/", (req, res) => {
-  const ua     = req.headers["user-agent"] || "";
-  const opera  = req.headers["x-operamini-phone-ua"];
-  const accept = req.headers["x-requested-with"];
-
-  const isOperaMini = ua.includes("Opera Mini") || opera || accept === "com.opera.mini.native";
-
-  if (isOperaMini) {
-    return res.redirect("/games-opera");
-  }
-
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
-});
-
-app.get("/games", (_req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "games.html"));
-});
-
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
@@ -128,22 +109,45 @@ app.get("/image/:filename", async (req, res) => {
   }
 });
 
-app.get("/screenshot/:id", async (req, res) => {
-  const imageName = req.params.id;
+// ╭─ menangkap apa pun sesudah /screenshot/ ─╮
+app.get(/^\/screenshot\/(.+)$/, async (req, res) => {
+  const key = req.params[0];            // "screenshots/monsterhunter/MH1.png"
+  const filename = path.basename(key);  // "MH1.png"
 
   try {
-    const command = new GetObjectCommand({
+    const { Body } = await s3.send(new GetObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,
-      Key: `screenshot/${imageName}`,
-    });
+      Key: key,
+    }));
 
-    const data = await s3.send(command);
-
-    res.setHeader("Content-Type", "image/png");
-    data.Body.pipe(res);
+    res.setHeader("Content-Type", mime.lookup(filename) || "image/png");
+    Body.pipe(res);
   } catch (err) {
     console.error("Screenshot fetch error:", err);
     res.status(404).send("Screenshot not found");
+  }
+});
+
+app.get("/screenshots-list/:folder", async (req, res) => {
+  const folder = req.params.folder;
+  const prefix = `screenshots/${folder}/`;
+
+  try {
+    const command = new ListObjectsV2Command({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Prefix: prefix,
+    });
+
+    const result = await s3.send(command);
+
+    const screenshots = (result.Contents || [])
+      .map((obj) => obj.Key)
+      .filter((key) => /\.(png|jpg|jpeg|gif)$/i.test(key));
+
+    res.json(screenshots);
+  } catch (err) {
+    console.error("❌ Error saat mengambil daftar screenshot:", err);
+    res.status(500).json({ error: "Gagal mengambil daftar screenshot" });
   }
 });
 

@@ -12,7 +12,8 @@ export const games = [
     description:
       "Action‑RPG seru bertema Monster Hunter dengan alur quest penuh!",
     cover: "/image/Monster_Hunter_Cover.png",
-    screenshotFolder: "/screenshots/monsterhunter/"
+    screenshotFolder: "screenshots/monsterhunter",
+    folderSlug: "monsterhunter"
   }
   // … game lainnya
 ];

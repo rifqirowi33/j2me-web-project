@@ -1,3 +1,4 @@
+import mime from "mime-types";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -46,10 +47,10 @@ app.get("/", (req, res) => {
 app.get("/games", (_req, res) => res.json(games));
 
 app.get("/games-opera", (req, res) => {
-  const list = games.map(g => `
+  const list = games.map(game => `
     <li>
-      <b>${g.title}</b> (${g.year})<br>
-      <a href="/download/${g.id}">Unduh (${(g.size / 1024).toFixed(1)} KB)</a>
+      <b>${game.name}</b> (${game.year})<br>
+      <a href="/download/${game.id}">Unduh (${(game.size / 1024).toFixed(1)} KB)</a>
     </li>
   `).join("");
 
@@ -97,6 +98,45 @@ app.get("/download/:id", async (req, res) => {
   } catch (err) {
     console.error("Download error:", err);
     res.status(500).json({ error: "Gagal mengunduh file" });
+  }
+});
+
+app.get("/image/:filename", async (req, res) => {
+  const { filename } = req.params;
+  const key = `covers/${filename}`; // <=== PENTING: gunakan folder sesuai struktur R2 kamu
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: key,
+    });
+
+    const data = await s3.send(command);
+
+    res.setHeader("Content-Type", mime.lookup(filename) || "application/octet-stream");
+    data.Body.pipe(res);
+  } catch (err) {
+    console.error("❌ Image error:", err);
+    res.status(404).send("Image not found");
+  }
+});
+
+app.get("/screenshot/:id", async (req, res) => {
+  const imageName = req.params.id;
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: `screenshot/${imageName}`,
+    });
+
+    const data = await s3.send(command);
+
+    res.setHeader("Content-Type", "image/png");
+    data.Body.pipe(res);
+  } catch (err) {
+    console.error("Screenshot fetch error:", err);
+    res.status(404).send("Screenshot not found");
   }
 });
 

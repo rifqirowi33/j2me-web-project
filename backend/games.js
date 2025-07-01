@@ -11,7 +11,7 @@ export const games = [
     downloads: 6789,
     description:
       "Action‑RPG seru bertema Monster Hunter dengan alur quest penuh!",
-    cover: "images/covers/monster-hunter.jpg",
+    cover: "/image/Monster_Hunter_Cover.png",
     screenshots: [
       "images/screens/monster-hunter-1.jpg",
       "images/screens/monster-hunter-2.jpg",

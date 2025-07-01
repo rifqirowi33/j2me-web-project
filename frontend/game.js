@@ -20,16 +20,16 @@ fetch("/games")
         <img class="cover" src="${g.cover}" alt="Cover ${g.name}" />
         <div class="info">
           <h2>${g.name}</h2>
-          <p><strong>Rilis:</strong> ${g.year}</p>
-          <p><strong>Layar:</strong> ${g.screen}</p>
-          <p><strong>Mod:</strong> ${g.mod}</p>
+          <p><strong>Tahun Rilis:</strong> ${g.year}</p>
+          <p><strong>Ukuran Layar:</strong> ${g.screen}</p>
+          <p><strong>Rincian Mod:</strong> ${g.mod}</p>
           <p><strong>Vendor:</strong> ${g.vendor}</p>
           <p><strong>Diunduh:</strong> ${g.downloads}×</p>
           <p>${g.description}</p>
         </div>
       </div>
 
-      <h3>Screenshot</h3>
+      <h3 class="ss">Screenshot</h3>
       <div class="carousel">
         <button id="prevBtn">◀</button>
         <div class="track" id="track"></div>

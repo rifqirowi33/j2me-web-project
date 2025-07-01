@@ -14,6 +14,22 @@ export const games = [
     cover: "/image/Monster_Hunter_Cover.png",
     screenshotFolder: "screenshots/monsterhunter",
     folderSlug: "monsterhunter"
+  },
+  {
+    id: "legend-of-martial-arts",
+    name: "Legend Of Martial Arts",
+    key: "games/Legend_Of Martial_Arts_240x320.jar",
+    size: 1010000,
+    year: 2025,
+    screen: "240×320",
+    mod: "Bahasa Indonesia 100% hanya cerita",
+    vendor: "QQ Tencent",
+    downloads: 789,
+    description:
+      "Game Beat'em Up seru dengan efek pertarungan yang fantastis dalam genggaman ponselmu!",
+    cover: "/image/Legend_Of_Martial_Cover.png",
+    screenshotFolder: "screenshots/legendofmartial",
+    folderSlug: "legendofmartial"
   }
   // … game lainnya
 ];

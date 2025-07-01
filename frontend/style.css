@@ -55,6 +55,7 @@ a:active {
 }
 
 ul#game-list {
+  font-size: 18px;
   list-style: none;
 }
 
@@ -76,13 +77,23 @@ a {
   margin-bottom: 15px;
 }
 .cover {
-  width: 120px;
-  height: 160px;
+  width: 240px;
+  height: 320px;
   object-fit: cover;
   border: 1px solid #fff;
 }
 .info h2 {
+  font-size: 24px;
+  font-weight: bold;
   margin-bottom: 6px;
+}
+.info p{
+  font-size: 18px;
+}
+
+.ss {
+  font-size: 18px;
+  margin: 5px;
 }
 
 /* carousel */
@@ -103,11 +114,11 @@ a {
   overflow-x: hidden;
   scroll-behavior: smooth;
   gap: 5px;
-  width: 80%;
+  width: 100%;
 }
 .track img {
-  width: 150px;
-  height: 120px;
+  width: 160px;
+  height: 180px;
   object-fit: cover;
   cursor: pointer;
   border: 1px solid #fff;

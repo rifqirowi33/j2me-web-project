@@ -1,53 +1,59 @@
-// ─── Import & Setup ────────────────────────────────────────────────────────
 import mime from "mime-types";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "config.env") });
+
 import express from "express";
-import fs from "fs";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { createS3Client } from "./r2client.js";
 import { games } from "./games.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.resolve(__dirname, "config.env") });
-
+// Setelah dotenv dimuat, baru buat client S3
 const s3 = createS3Client(process.env);
-const app = express();
+
+const app  = express();
 const PORT = process.env.PORT || 3535;
 
+import fs from "fs"; // di bagian atas
 const FRONTEND_PATH = path.join(__dirname, "..", "frontend");
 
-// ─── Serve Static ───────────────────────────────────────────────────────────
+// layani frontend static dari folder /frontend
 app.use(express.static(FRONTEND_PATH));
 
-// ─── Homepage Detection Opera Mini ──────────────────────────────────────────
-app.get("/", (req, res) => {
-  const ua = req.headers["user-agent"] || "";
-  const opera = req.headers["x-operamini-phone-ua"];
-  const accept = req.headers["x-requested-with"];
-  const isOM = ua.includes("Opera Mini") || opera || accept === "com.opera.mini.native";
+app.get("/games", (_req, res) => res.json(games));
 
-  if (isOM) return res.redirect("/games-opera");
+// fallback: kalau user buka '/', tampilkan index.html dari /frontend
+app.get("/", (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
-// ─── Route Clean URLs ───────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  const ua     = req.headers["user-agent"] || "";
+  const opera  = req.headers["x-operamini-phone-ua"];
+  const accept = req.headers["x-requested-with"];
+
+  const isOperaMini = ua.includes("Opera Mini") || opera || accept === "com.opera.mini.native";
+
+  if (isOperaMini) {
+    return res.redirect("/games-opera");
+  }
+
+  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+});
+
 app.get("/games", (_req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "games.html"));
 });
 
-app.get("/game", (_req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "game.html"));
-});
 
-// ─── API Endpoint Games JSON ────────────────────────────────────────────────
-app.get("/url/games", (_req, res) => res.json(games));
+app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
-// ─── Halaman Ringan untuk Opera Mini ────────────────────────────────────────
-app.get("/games-opera", (_req, res) => {
+app.get("/games-opera", (req, res) => {
   const list = games.map(game => `
     <li>
       <b>${game.name}</b> (${game.year})<br>
@@ -79,20 +85,22 @@ app.get("/games-opera", (_req, res) => {
   res.send(html);
 });
 
-// ─── Download File JAR dari R2 ───────────────────────────────────────────────
 app.get("/download/:id", async (req, res) => {
   const game = games.find(g => g.id === req.params.id);
   if (!game) return res.status(404).json({ error: "Game not found" });
 
   try {
-    const cmd = new GetObjectCommand({
+    const cmd  = new GetObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,
-      Key: game.key,
+      Key   : game.key,
     });
     const data = await s3.send(cmd);
 
     res.setHeader("Content-Type", "application/java-archive");
-    res.setHeader("Content-Disposition", `attachment; filename="${game.key}"`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${game.key}"`
+    );
     data.Body.pipe(res);
   } catch (err) {
     console.error("Download error:", err);
@@ -100,10 +108,9 @@ app.get("/download/:id", async (req, res) => {
   }
 });
 
-// ─── Cover Image dari R2 ─────────────────────────────────────────────────────
 app.get("/image/:filename", async (req, res) => {
   const { filename } = req.params;
-  const key = `covers/${filename}`; // sesuaikan dengan struktur di R2 kamu
+  const key = `covers/${filename}`; // <=== PENTING: gunakan folder sesuai struktur R2 kamu
 
   try {
     const command = new GetObjectCommand({
@@ -121,7 +128,6 @@ app.get("/image/:filename", async (req, res) => {
   }
 });
 
-// ─── Screenshot Image dari R2 ────────────────────────────────────────────────
 app.get("/screenshot/:id", async (req, res) => {
   const imageName = req.params.id;
 
@@ -141,7 +147,6 @@ app.get("/screenshot/:id", async (req, res) => {
   }
 });
 
-// ─── Start Server ────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`✅ Server berjalan di http://localhost:${PORT}`);
-});
+app.listen(PORT, () =>
+  console.log(`✅ Server berjalan di http://localhost:${PORT}`)
+);

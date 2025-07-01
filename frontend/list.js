@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("/url/games")
+  fetch("/games")
     .then(res => res.json())
     .then(games => {
       const list = document.getElementById("game-list");

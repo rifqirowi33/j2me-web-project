@@ -71,16 +71,19 @@ app.get("/download/:id", async (req, res) => {
   if (!game) return res.status(404).json({ error: "Game not found" });
 
   try {
-    const cmd  = new GetObjectCommand({
+    const cmd = new GetObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,
-      Key   : game.key,
+      Key: game.key,
     });
     const data = await s3.send(cmd);
+
+    // ambil nama file asli dari key (hilangkan 'games/')
+    const originalFilename = path.basename(game.key);
 
     res.setHeader("Content-Type", "application/java-archive");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${game.key}"`
+      `attachment; filename="${originalFilename}"`
     );
     data.Body.pipe(res);
   } catch (err) {

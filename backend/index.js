@@ -44,7 +44,14 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
-app.get("/games", (_req, res) => res.json(games));
+app.get("/api/games", (_req, res) => res.json(games));
+
+app.get("/games", (_req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "games.html"));
+});
+
+
+app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
 app.get("/games-opera", (req, res) => {
   const list = games.map(game => `

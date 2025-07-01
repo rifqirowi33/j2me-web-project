@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!gameList) return;
 
   try {
-    const res = await fetch("/games");
+    const res = await fetch("/api/games");
     const games = await res.json();
 
     games.forEach(game => {
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       li.style.borderBottom = "1px dotted white";
 
       li.innerHTML = `
-        📦 <a href="game.html?id=${game.id}">${game.name}</a> (${game.year})
+        📦 <a href="game?id=${game.id}">${game.name}</a> (${game.year})
       `;
 
       gameList.appendChild(li);

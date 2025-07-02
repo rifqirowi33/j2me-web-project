@@ -170,7 +170,7 @@ app.get("/games", (req, res) => {
 //   `);
 // });
 
-app.get("/datagames", (_req, res) => {
+app.get("/gamelist", (_req, res) => {
   res.json(readGames());
 });
 

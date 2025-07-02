@@ -37,12 +37,29 @@ fetch("/games")
       </div>
 
       <p style="margin-top:12px;">
-        <a class="dl-btn" href="/download/${g.id}">
-          ⬇️ Unduh (${(g.size / 1024).toFixed(1)} KB)
+        <a class="dl-btn" id="downloadBtn" href="/download/${g.id}">
+        ⬇️ Unduh (${(g.size / 1024).toFixed(1)} KB)
         </a>
-      </p>
-    `;
-
+      </p>`;
+      
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        fetch(`/api/increment-download/${g.id}`, { method: "POST" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+        // Perbarui angka unduhan di UI
+        const info = document.querySelector(".info");
+        info.innerHTML = info.innerHTML.replace(
+          /Diunduh:<\/strong> \d+×/,
+          `Diunduh:</strong> ${data.downloads}×`
+        );
+      }
+    })
+    .catch((err) => {
+      console.error("❌ Gagal memperbarui jumlah unduhan:", err);
+    });
+  });
+    
     // Ambil screenshot dari backend
     fetch(`/screenshots-list/${g.folderSlug}`)
     .then((r) => r.json())

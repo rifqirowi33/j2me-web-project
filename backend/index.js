@@ -12,6 +12,7 @@ import express from "express";
 import { ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createS3Client } from "./r2client.js";
 import { games } from "./games.js";
+import { incrementDownload } from "./games.js";
 
 // Setelah dotenv dimuat, baru buat client S3
 const s3 = createS3Client(process.env);
@@ -151,6 +152,15 @@ app.get("/screenshots-list/:folder", async (req, res) => {
   } catch (err) {
     console.error("❌ Error saat mengambil daftar screenshot:", err);
     res.status(500).json({ error: "Gagal mengambil daftar screenshot" });
+  }
+});
+
+app.post("/api/increment-download/:id", (req, res) => {
+  const game = incrementDownload(req.params.id);
+  if (game) {
+    res.json({ success: true, downloads: game.downloads });
+  } else {
+    res.status(404).json({ error: "Game not found" });
   }
 });
 

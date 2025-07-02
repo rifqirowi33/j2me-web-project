@@ -73,12 +73,13 @@ a {
 /* container kiri-kanan */
 .game-box {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 15px;
 }
 .cover {
-  width: 220px;
-  height: 270px;
+  width: 240px;
+  height: auto;
   object-fit: cover;
   border: 1px solid #fff;
 }

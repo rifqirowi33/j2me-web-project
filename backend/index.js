@@ -32,11 +32,40 @@ const FRONTEND_PATH = path.join(__dirname, "..", "frontend");
 // layani frontend static dari folder /frontend
 app.use(express.static(FRONTEND_PATH));
 
-app.get("/games", (_req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "games.html"));
+app.get("/games", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Daftar Game</title>
+      <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body>
+
+      <header>
+        <h1>Daftar Game</h1>
+        <p>Silakan unduh game Java favoritmu!</p>
+      </header>
+
+      <main>
+        <ul id="game-list">
+          <!-- akan diisi oleh JS -->
+        </ul>
+      </main>
+
+      <footer>
+        <p>© 2025 JAVA.REPP.MY.ID</p>
+      </footer>
+
+      <script src="/main.js"></script>
+    </body>
+    </html>
+  `);
 });
 
-app.get("/data/games", (_req, res) => {
+app.get("/datagames", (_req, res) => {
   res.json(readGames());
 });
 

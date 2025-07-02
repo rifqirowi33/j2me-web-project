@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!gameList) return;
 
   try {
-    const res = await fetch("/data/games");
+    const res = await fetch("/datagames");
     const games = await res.json();
 
     games.forEach(game => {

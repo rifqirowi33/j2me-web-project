@@ -5,7 +5,7 @@ if (!id || !container) {
   console.error("❌ ID game atau elemen container tidak ditemukan");
 }
 
-fetch("/data/games")
+fetch("/datagames")
   .then((r) => r.json())
   .then((data) => {
     const g = data.find((x) => x.id === id);

@@ -35,20 +35,74 @@ app.get("/", (req, res) => {
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
+app.get("/game-opera", async (req, res) => {
+  const id = req.query.id;
+  const game = games.find((g) => g.id === id);
+
+  if (!game) {
+    return res.send("<h2>Game tidak ditemukan</h2>");
+  }
+
+  // Ambil screenshot dari R2
+  let screenshotList = [];
+  try {
+    const prefix = `screenshots/${game.folderSlug}/`;
+    const result = await s3.send(new ListObjectsV2Command({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Prefix: prefix,
+    }));
+    screenshotList = (result.Contents || [])
+      .map((obj) => obj.Key)
+      .filter((key) => /\.(png|jpe?g|gif)$/i.test(key))
+      .map((key) => `/screenshot/${key}`);
+  } catch (err) {
+    console.error("❌ Gagal ambil screenshot:", err.message);
+  }
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8" />
+      <title>${game.name}</title>
+      <style>
+        body { background: black; color: white; font-family: sans-serif; padding: 14px; }
+        a { color: cyan; }
+        img { max-width: 100%; margin: 6px 0; border: 1px solid #444; }
+      </style>
+    </head>
+    <body>
+      <h2>${game.name}</h2>
+      <p><strong>Tahun:</strong> ${game.year}</p>
+      <p><strong>Layar:</strong> ${game.screen}</p>
+      <p><strong>Mod:</strong> ${game.mod}</p>
+      <p><strong>Vendor:</strong> ${game.vendor}</p>
+      <p><strong>Deskripsi:</strong><br>${game.description}</p>
+
+      <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
+
+      ${
+        screenshotList.length
+          ? `<h3>Screenshot:</h3>` + screenshotList.map(src => `<p><img src="${src}"></p>`).join("")
+          : `<p><em>(Tidak ada screenshot)</em></p>`
+      }
+
+      <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
+      <p><a href="/games-opera">← Kembali ke daftar</a></p>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
+
 // untuk tampilan operamini, symbian, hp java
 app.get("/games-opera", (req, res) => {
   const list = games.map(game => `
-    <li>
-      <b onclick="toggleDetail('${game.id}')" style="cursor:pointer">${game.name}</b> (${game.year})
-      <div id="detail-${game.id}" style="display:none; margin-left:10px; margin-top:5px;">
-        <p><img src="${game.cover}" width="120" alt="cover"></p>
-        <p><strong>Ukuran:</strong> ${(game.size / 1024).toFixed(1)} KB</p>
-        <p><strong>Mod:</strong> ${game.mod}</p>
-        <p><strong>Vendor:</strong> ${game.vendor}</p>
-        <p>${game.description}</p>
-        <div id="ss-${game.id}">📷 Loading screenshot...</div>
-        <p><a href="/download/${game.id}">⬇️ Unduh</a></p>
-      </div>
+    <li style="margin-bottom: 10px;">
+      <a href="/game-opera?id=${game.id}">
+        <b>${game.name}</b> (${game.year})
+      </a>
     </li>
   `).join("");
 
@@ -70,40 +124,6 @@ app.get("/games-opera", (req, res) => {
       <ul>${list}</ul>
       <hr>
       <small>&copy; 2025 java.repp.my.id</small>
-
-      <script>
-        function toggleDetail(id) {
-          const el = document.getElementById("detail-" + id);
-          const ssBox = document.getElementById("ss-" + id);
-
-          if (el.style.display === "none") {
-            el.style.display = "block";
-
-            // Cek kalau screenshot belum dimuat
-            if (!ssBox.dataset.loaded) {
-              fetch('/screenshots-list/' + id)
-                .then(r => r.json())
-                .then(list => {
-                  if (!Array.isArray(list)) throw new Error("Format tidak valid");
-                  if (list.length === 0) {
-                    ssBox.innerHTML = "Tidak ada screenshot.";
-                    return;
-                  }
-
-                  ssBox.innerHTML = list.map(path => 
-                    '<img src="/screenshot/' + path + '" alt="ss">'
-                  ).join("");
-                  ssBox.dataset.loaded = "yes";
-                })
-                .catch(e => {
-                  ssBox.innerHTML = "❌ Gagal memuat screenshot";
-                });
-            }
-          } else {
-            el.style.display = "none";
-          }
-        }
-      </script>
     </body>
     </html>
   `;

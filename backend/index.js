@@ -136,6 +136,7 @@ app.get("/download/:id", async (req, res) => {
   if (!game) return res.status(404).json({ error: "Game not found" });
 
   try {
+    incrementDownload(game.id);  // <- angka otomatis naik & disimpan
     const cmd = new GetObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,
       Key: game.key,

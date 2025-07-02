@@ -54,7 +54,7 @@ app.get("/games", (req, res) => {
     <body>
 
       <header>
-        <h1>Daftar Game Java</h1>
+        <h1>📱Daftar Game Java</h1>
         <p>Temukan dan unduh game Java favoritmu!</p>
       </header>
 
@@ -270,7 +270,7 @@ app.get("/games-classic", (req, res) => {
       </style>
     </head>
     <body>
-      <h2>📱 JAVA REPP.MY.ID</h2>
+      <h2>📟JAVA REPP.MY.ID</h2>
       <p>mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail Game</p>
       <ul>${list}</ul>
       <hr>

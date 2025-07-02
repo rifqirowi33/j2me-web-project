@@ -21,12 +21,21 @@ const app  = express();
 const PORT = process.env.PORT || 3535;
 
 import fs from "fs"; // di bagian atas
+const gamesFilePath = path.join(__dirname, "games.json"); // atau "./backend/games.json" sesuai letaknya
+
+function readGames() {
+  const raw = fs.readFileSync(gamesFilePath, "utf-8");
+  return JSON.parse(raw);
+}
 const FRONTEND_PATH = path.join(__dirname, "..", "frontend");
 
 // layani frontend static dari folder /frontend
 app.use(express.static(FRONTEND_PATH));
 
-app.get("/games", (_req, res) => res.json(games));
+app.get("/games", (_req, res) => {
+  res.json(readGames());
+});
+
 
 // fallback: kalau user buka '/', tampilkan index.html dari /frontend
 app.get("/", (req, res) => {
@@ -37,7 +46,7 @@ app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html
 
 app.get("/game-opera", async (req, res) => {
   const id = req.query.id;
-  const game = games.find((g) => g.id === id);
+  const game = readGames().find((g) => g.id === id);
 
   if (!game) {
     return res.send("<h2>Game tidak ditemukan</h2>");
@@ -77,6 +86,7 @@ app.get("/game-opera", async (req, res) => {
       <p><strong>Layar:</strong> ${game.screen}</p>
       <p><strong>Mod:</strong> ${game.mod}</p>
       <p><strong>Vendor:</strong> ${game.vendor}</p>
+      <p><strong>Total Diunduh:</strong> ${game.downloads} kali</p>
       <p><strong>Deskripsi:</strong><br>${game.description}</p>
 
       <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
@@ -88,6 +98,7 @@ app.get("/game-opera", async (req, res) => {
       }
 
       <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
+      <p><em>📥 ${game.downloads} unduhan</em></p>
       <p><a href="/games-opera">← Kembali ke daftar</a></p>
     </body>
     </html>
@@ -132,7 +143,7 @@ app.get("/games-opera", (req, res) => {
 });
 
 app.get("/download/:id", async (req, res) => {
-  const game = games.find(g => g.id === req.params.id);
+  const game = readGames().find((g) => g.id === req.params.id);
   if (!game) return res.status(404).json({ error: "Game not found" });
 
   try {

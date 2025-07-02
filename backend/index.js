@@ -33,6 +33,14 @@ const FRONTEND_PATH = path.join(__dirname, "..", "frontend");
 app.use(express.static(FRONTEND_PATH));
 
 app.get("/games", (req, res) => {
+  const games = readGames();
+
+  const list = games.map((g) => `
+    <li>
+      📦 <a href="/game?id=${g.id}">${g.name}</a> (${g.year})
+    </li>
+  `).join("");
+
   res.send(`
     <!DOCTYPE html>
     <html lang="id">
@@ -45,13 +53,13 @@ app.get("/games", (req, res) => {
     <body>
 
       <header>
-        <h1>Daftar Game</h1>
-        <p>Silakan unduh game Java favoritmu!</p>
+        <h1>📱 Daftar Game Java</h1>
+        <p>Temukan dan unduh game Java favoritmu!</p>
       </header>
 
       <main>
         <ul id="game-list">
-          <!-- akan diisi oleh JS -->
+          ${list}
         </ul>
       </main>
 
@@ -59,11 +67,108 @@ app.get("/games", (req, res) => {
         <p>© 2025 JAVA.REPP.MY.ID</p>
       </footer>
 
-      <script src="/main.js"></script>
     </body>
     </html>
   `);
 });
+
+// app.get("/games", (req, res) => {
+//   const games = readGames();
+
+//   const list = games.map((g) => `
+//     <li style="margin-bottom: 8px;">
+//       📦 <a href="/game?id=${g.id}" style="color:#0ff;text-decoration:none;">
+//         ${g.name}
+//       </a> (${g.year})
+//     </li>
+//   `).join("");
+
+//   res.send(`
+//     <!DOCTYPE html>
+//     <html lang="id">
+//     <head>
+//       <meta charset="UTF-8" />
+//       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//       <title>Daftar Game Java</title>
+//       <link rel="stylesheet" href="/style.css" />
+//       <style>
+//         body {
+//           background: black;
+//           color: white;
+//           font-family: sans-serif;
+//           padding: 20px;
+//         }
+//         a {
+//           color: #0ff;
+//           text-decoration: none;
+//         }
+//         a:hover {
+//           text-decoration: underline;
+//         }
+//         ul {
+//           list-style: none;
+//           padding: 0;
+//         }
+//       </style>
+//     </head>
+//     <body>
+//       <h1>📱 Daftar Game Java</h1>
+//       <p>Temukan dan unduh game Java favoritmu!</p>
+//       <hr>
+//       <ul>
+//         ${list}
+//       </ul>
+//       <hr>
+//       <p><a href="/">← Kembali ke Beranda</a></p>
+//       <footer><small>© 2025 JAVA.REPP.MY.ID</small></footer>
+//     </body>
+//     </html>
+//   `);
+// });
+
+// app.get("/games", (req, res) => {
+//   const games = readGames();
+
+//   const list = games.map((g) => `
+//     <div class="game-box" style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
+//       <img src="${g.cover}" alt="Cover ${g.name}" width="80" height="80" style="border-radius:12px;border:1px solid #ccc;" />
+//       <div>
+//         <h3 style="margin:0 0 6px 0;">📦 <a href="/game?id=${g.id}" style="text-decoration:none;color:#0ff">${g.name}</a></h3>
+//         <p style="margin:0;font-size:14px;">
+//           Tahun: ${g.year} | Ukuran: ${g.screen}<br>
+//           Mod: ${g.mod} | Vendor: ${g.vendor}<br>
+//           <strong>📥 ${g.downloads} unduhan</strong>
+//         </p>
+//       </div>
+//     </div>
+//   `).join("");
+
+//   res.send(`
+//     <!DOCTYPE html>
+//     <html lang="id">
+//     <head>
+//       <meta charset="UTF-8" />
+//       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//       <title>Daftar Game Java</title>
+//       <link rel="stylesheet" href="/style.css" />
+//       <style>
+//         body { background: black; color: white; font-family: sans-serif; padding: 20px; }
+//         a { color: #0ff; text-decoration: none; }
+//         a:hover { text-decoration: underline; }
+//       </style>
+//     </head>
+//     <body>
+//       <h1>📱 Daftar Game Java</h1>
+//       <p>Temukan dan unduh game Java favoritmu!</p>
+//       <hr style="border: 1px solid #333; margin: 12px 0;">
+//       ${list}
+//       <hr>
+//       <p><a href="/">← Kembali ke Beranda</a></p>
+//       <footer><small>© 2025 JAVA.REPP.MY.ID</small></footer>
+//     </body>
+//     </html>
+//   `);
+// });
 
 app.get("/datagames", (_req, res) => {
   res.json(readGames());

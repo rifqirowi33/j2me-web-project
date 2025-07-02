@@ -42,23 +42,23 @@ fetch("/games")
         </a>
       </p>`;
       
+      
       document.getElementById("downloadBtn").addEventListener("click", () => {
-        fetch(`/api/increment-download/${g.id}`, { method: "POST" })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-        // Perbarui angka unduhan di UI
-        const info = document.querySelector(".info");
-        info.innerHTML = info.innerHTML.replace(
-          /Diunduh:<\/strong> \d+×/,
-          `Diunduh:</strong> ${data.downloads}×`
-        );
-      }
-    })
-    .catch((err) => {
-      console.error("❌ Gagal memperbarui jumlah unduhan:", err);
-    });
-  });
+        setTimeout(() => {
+          fetch("/games")
+          .then((r) => r.json())
+          .then((data) => {
+            const updated = data.find(x => x.id === g.id);
+            if (updated) {
+              const info = document.querySelector(".info");
+              info.innerHTML = info.innerHTML.replace(
+                /Diunduh:<\/strong> \d+×/,
+                `Diunduh:</strong> ${updated.downloads}×`
+              );
+            }
+          });
+        }, 2000); // delay 2 detik setelah unduh
+        });
     
     // Ambil screenshot dari backend
     fetch(`/screenshots-list/${g.folderSlug}`)

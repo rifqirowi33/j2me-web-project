@@ -77,8 +77,8 @@ a {
   margin-bottom: 15px;
 }
 .cover {
-  width: 240px;
-  height: 320px;
+  width: 220px;
+  height: 270px;
   object-fit: cover;
   border: 1px solid #fff;
 }

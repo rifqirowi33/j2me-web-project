@@ -48,13 +48,13 @@ app.get("/games", (req, res) => {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Daftar Game</title>
+      <title>Daftar Game Java</title>
       <link rel="stylesheet" href="/style.css" />
     </head>
     <body>
 
       <header>
-        <h1>📱 Daftar Game Java</h1>
+        <h1>Daftar Game Java</h1>
         <p>Temukan dan unduh game Java favoritmu!</p>
       </header>
 

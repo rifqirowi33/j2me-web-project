@@ -35,11 +35,20 @@ app.get("/", (req, res) => {
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
+// untuk tampilan operamini, symbian, hp java
 app.get("/games-opera", (req, res) => {
   const list = games.map(game => `
     <li>
-      <b>${game.name}</b> (${game.year})<br>
-      <a href="/download/${game.id}">Unduh (${(game.size / 1024).toFixed(1)} KB)</a>
+      <b onclick="toggleDetail('${game.id}')" style="cursor:pointer">${game.name}</b> (${game.year})
+      <div id="detail-${game.id}" style="display:none; margin-left:10px; margin-top:5px;">
+        <p><img src="${game.cover}" width="120" alt="cover"></p>
+        <p><strong>Ukuran:</strong> ${(game.size / 1024).toFixed(1)} KB</p>
+        <p><strong>Mod:</strong> ${game.mod}</p>
+        <p><strong>Vendor:</strong> ${game.vendor}</p>
+        <p>${game.description}</p>
+        <div id="ss-${game.id}">📷 Loading screenshot...</div>
+        <p><a href="/download/${game.id}">⬇️ Unduh</a></p>
+      </div>
     </li>
   `).join("");
 
@@ -47,19 +56,54 @@ app.get("/games-opera", (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Daftar Game Java</title>
+      <title>JAVA REPP.MY.ID</title>
       <meta charset="utf-8">
       <style>
-        body { background:black; color:white; font-family:sans-serif; padding:10px; }
-        a { color: #0ff }
+        body { background: black; color: white; font-family: sans-serif; padding: 10px; }
+        a { color: #0ff; }
+        img { max-width: 100px; height: auto; margin: 2px; border: 1px solid #444; }
       </style>
     </head>
     <body>
-      <h2>📱 Game Java J2ME</h2>
-      <p>Kompatibel dengan Opera Mini</p>
+      <h2>📱 JAVA REPP.MY.ID</h2>
+      <p>mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail Game</p>
       <ul>${list}</ul>
       <hr>
       <small>&copy; 2025 java.repp.my.id</small>
+
+      <script>
+        function toggleDetail(id) {
+          const el = document.getElementById("detail-" + id);
+          const ssBox = document.getElementById("ss-" + id);
+
+          if (el.style.display === "none") {
+            el.style.display = "block";
+
+            // Cek kalau screenshot belum dimuat
+            if (!ssBox.dataset.loaded) {
+              fetch('/screenshots-list/' + id)
+                .then(r => r.json())
+                .then(list => {
+                  if (!Array.isArray(list)) throw new Error("Format tidak valid");
+                  if (list.length === 0) {
+                    ssBox.innerHTML = "Tidak ada screenshot.";
+                    return;
+                  }
+
+                  ssBox.innerHTML = list.map(path => 
+                    '<img src="/screenshot/' + path + '" alt="ss">'
+                  ).join("");
+                  ssBox.dataset.loaded = "yes";
+                })
+                .catch(e => {
+                  ssBox.innerHTML = "❌ Gagal memuat screenshot";
+                });
+            }
+          } else {
+            el.style.display = "none";
+          }
+        }
+      </script>
     </body>
     </html>
   `;

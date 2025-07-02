@@ -36,7 +36,7 @@ app.get("/games", (_req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, "games.html"));
 });
 
-app.get("/gamelist", (_req, res) => {
+app.get("/data/games", (_req, res) => {
   res.json(readGames());
 });
 

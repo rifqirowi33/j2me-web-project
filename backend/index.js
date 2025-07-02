@@ -35,9 +35,10 @@ app.use(express.static(FRONTEND_PATH));
 app.get("/games", (req, res) => {
   const games = readGames();
 
-  const list = games.map((g) => `
+  const list = games.map(g => `
     <li>
-      📦 <a href="/game?id=${g.id}">${g.name}</a> (${g.year})
+    <img src="/icon/${g.icon}" alt="" class="game-icon">
+    <a href="/game?id=${g.id}">${g.name}</a> (${g.year})
     </li>
   `).join("");
 
@@ -182,7 +183,7 @@ app.get("/", (req, res) => {
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
-app.get("/game-opera", async (req, res) => {
+app.get("/game-classic", async (req, res) => {
   const id = req.query.id;
   const game = readGames().find((g) => g.id === id);
 
@@ -220,14 +221,13 @@ app.get("/game-opera", async (req, res) => {
     </head>
     <body>
       <h2>${game.name}</h2>
+      <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
       <p><strong>Tahun:</strong> ${game.year}</p>
       <p><strong>Layar:</strong> ${game.screen}</p>
       <p><strong>Mod:</strong> ${game.mod}</p>
       <p><strong>Vendor:</strong> ${game.vendor}</p>
       <p><strong>Total Diunduh:</strong> ${game.downloads} kali</p>
-      <p><strong>Deskripsi:</strong><br>${game.description}</p>
-
-      <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
+      <p><strong>Deskripsi:</strong><br><br> ${game.description} </p><br>
 
       ${
         screenshotList.length
@@ -237,7 +237,7 @@ app.get("/game-opera", async (req, res) => {
 
       <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
       <p><em>📥 ${game.downloads} unduhan</em></p>
-      <p><a href="/games-opera">← Kembali ke daftar</a></p>
+      <p><a href="/games-classic">← Kembali ke daftar</a></p>
     </body>
     </html>
   `;
@@ -246,12 +246,14 @@ app.get("/game-opera", async (req, res) => {
 });
 
 // untuk tampilan operamini, symbian, hp java
-app.get("/games-opera", (req, res) => {
+app.get("/games-classic", (req, res) => {
   const list = games.map(game => `
-    <li style="margin-bottom: 10px;">
-      <a href="/game-opera?id=${game.id}">
-        <b>${game.name}</b> (${game.year})
-      </a>
+    <li style="margin-bottom:10px;display:flex;align-items:center;">
+    <img src="/icon/${game.icon}" alt="" width="24" height="24"
+    style="margin-right:6px;border:1px solid #444">
+    <a href="/game-classic?id=${game.id}">
+    <b>${game.name}</b> (${game.year})
+    </a>
     </li>
   `).join("");
 
@@ -375,6 +377,25 @@ app.post("/api/increment-download/:id", (req, res) => {
     res.json({ success: true, downloads: game.downloads });
   } else {
     res.status(404).json({ error: "Game not found" });
+  }
+});
+
+app.get("/icon/:filename", async (req, res) => {
+  const { filename } = req.params;
+  const key = `icons/${filename}`; // disimpan di folder 'icons/' di R2
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: key,
+    });
+
+    const data = await s3.send(command);
+    res.setHeader("Content-Type", mime.lookup(filename) || "image/png");
+    data.Body.pipe(res);
+  } catch (err) {
+    console.error("❌ Icon error:", err);
+    res.status(404).send("Icon not found");
   }
 });
 

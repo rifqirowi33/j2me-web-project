@@ -12,7 +12,8 @@
     "description": "Action‑RPG seru bertema Monster Hunter dengan alur quest penuh!",
     "cover": "/image/Monster_Hunter_Cover.png",
     "screenshotFolder": "screenshots/monsterhunter",
-    "folderSlug": "monsterhunter"
+    "folderSlug": "monsterhunter",
+    "icon": "monsterhunter-icon.png"
   },
   {
     "id": "legend-of-martial-arts",
@@ -27,6 +28,7 @@
     "description": "Game Beat'em Up seru dengan efek pertarungan yang fantastis dalam genggaman ponselmu!",
     "cover": "/image/Legend_Of_Martial_Cover.png",
     "screenshotFolder": "screenshots/legendofmartial",
-    "folderSlug": "legendofmartial"
+    "folderSlug": "legendofmartial",
+    "icon": "legendmartialarts-icon.png"
   }
 ]

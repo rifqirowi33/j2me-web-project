@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       li.style.borderBottom = "1px dotted white";
 
       li.innerHTML = `
-        📦 <a href="game?id=${game.id}">${game.name}</a> (${game.year})
+        <img src="/icon/${game.icon}" class="game-icon" alt="">
+        <a href="game?id=${game.id}">${game.name}</a> (${game.year})
       `;
 
       gameList.appendChild(li);

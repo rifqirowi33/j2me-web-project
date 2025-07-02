@@ -33,6 +33,10 @@ const FRONTEND_PATH = path.join(__dirname, "..", "frontend");
 app.use(express.static(FRONTEND_PATH));
 
 app.get("/games", (_req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "games.html"));
+});
+
+app.get("/gamelist", (_req, res) => {
   res.json(readGames());
 });
 

@@ -381,3 +381,69 @@ app.post("/api/increment-download/:id", (req, res) => {
 app.listen(PORT, () =>
   console.log(`✅ Server berjalan di http://localhost:${PORT}`)
 );
+
+// Halaman 404: tangkap semua route yang tidak cocok
+app.use((req, res) => {
+  res.status(404).send(`
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+      <meta charset="UTF-8" />
+      <title>404 - Tidak Ditemukan</title>
+      <style>
+        body {
+          background-color: black;
+          color: white;
+          font-family: monospace;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+
+        h1 {
+          font-size: 2em;
+          margin-bottom: 0.5em;
+          color: #fff;
+        }
+
+        .flicker {
+          font-size: 8rem;
+          color: #666;
+          animation: flickerAnim 2s infinite;
+          text-shadow: 0 0 5px #f00, 0 0 10px #f00;
+        }
+
+        @keyframes flickerAnim {
+          0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+            color: #f00;
+            opacity: 1;
+            text-shadow: 0 0 5px #f00, 0 0 10px #f00;
+          }
+          20%, 22%, 24%, 55% {
+            color: #333;
+            opacity: 0.4;
+            text-shadow: none;
+          }
+          60%, 62%, 64% {
+            color: #f00;
+            opacity: 0.8;
+            text-shadow: 0 0 3px #f00;
+          }
+          61%, 63%, 65% {
+            color: #222;
+            opacity: 0.3;
+            text-shadow: none;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Tidak ada apapun</h1>
+      <div class="flicker">404</div>
+    </body>
+    </html>
+  `);
+});

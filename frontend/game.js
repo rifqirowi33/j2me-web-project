@@ -99,23 +99,37 @@ fetch("/gamelist")
         };
 
         /* swipe di layar sentuh */
-        let startX = 0;
-        track.addEventListener("touchstart", (e) => {
-          startX = e.touches[0].clientX;
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        
+        track.addEventListener("pointerdown", (e) => {
+          isDown = true;
+          track.style.cursor = "grabbing";
+          startX = e.pageX - track.offsetLeft;
+          scrollLeft = track.scrollLeft;
         });
-
-        track.addEventListener("touchend", (e) => {
-          const endX   = e.changedTouches[0].clientX;
-          const deltaX = endX - startX;
-
-          if (Math.abs(deltaX) > 30) {
-            if (deltaX > 0) {
-              idx = Math.max(idx - 1, 0);               // geser ke kiri
-            } else {
-              idx = Math.min(idx + 1, result.length - 1); // geser ke kanan
-            }
-            scrollTo();
-          }
+        
+        track.addEventListener("pointerleave", () => {
+          isDown = false;
+          track.style.cursor = "grab";
+        });
+        
+        track.addEventListener("pointerup", () => {
+          isDown = false;
+          track.style.cursor = "grab";
+        });
+        
+        track.addEventListener("pointermove", (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - track.offsetLeft;
+          const walk = (x - startX) * 1.5; // angka ini bisa kamu sesuaikan agar lebih/kurang geser
+          track.scrollLeft = scrollLeft - walk;
+        });
+      
+        track.addEventListener("pointercancel", () => {
+          isDragging = false;
         });
       })
       .catch((err) => {

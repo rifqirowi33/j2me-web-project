@@ -128,8 +128,13 @@ a {
   display: flex;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  cursor: grab;
   gap: 5px;
   width: 100%;
+}
+
+track:active {
+  cursor: grabbing;
 }
 
 .track img {

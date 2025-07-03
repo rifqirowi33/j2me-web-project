@@ -126,7 +126,7 @@ a {
 
 .track {
   display: flex;
-  overflow-x: auto;
+  overflow-x: scroll;
   scroll-behavior: smooth;
   cursor: pointer;
   user-select: none;

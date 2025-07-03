@@ -145,6 +145,18 @@ fetch("/gamelist")
     isPointerDown = false;
     track.style.cursor = "grab";
   });
+
+  // 🟨 Touch event (iOS Safari khusus)
+  track.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].pageX;
+    scrollStart = track.scrollLeft;
+  });
+
+  track.addEventListener("touchmove", (e) => {
+    const x = e.touches[0].pageX;
+    const walk = (x - startX) * 1.5;
+    track.scrollLeft = scrollStart - walk;
+  });
   
   })
   .catch(err => {

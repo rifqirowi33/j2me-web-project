@@ -115,31 +115,37 @@ fetch("/gamelist")
     prevBtn.onclick = () => { idx = Math.max(idx - 1, 0);               scrollTo(); };
     nextBtn.onclick = () => { idx = Math.min(idx + 1, result.length-1); scrollTo(); };
 
-    /* Swipe ‑ touch & mouse */
-    let isDown = false, startX = 0, scrollStart = 0;
-
-    const start = e => {
-      isDown      = true;
-      startX      = (e.touches ? e.touches[0].pageX : e.pageX);
+    /* SWIPE / DRAG support universal (pointer-only, all browsers incl Safari) */
+    let isPointerDown = false, startX = 0, scrollStart = 0;
+    
+    track.addEventListener("pointerdown", e => {
+      isPointerDown = true;
+      startX = e.pageX;
       scrollStart = track.scrollLeft;
-      track.style.cursor = "grabbing";
-    };
-    const move  = e => {
-      if (!isDown) return;
-      const x = (e.touches ? e.touches[0].pageX : e.pageX);
-      track.scrollLeft = scrollStart + (startX - x);
-    };
-    const end   = () => { isDown = false; track.style.cursor = "grab"; };
-
-    track.addEventListener("mousedown", start);
-    track.addEventListener("mousemove", move);
-    track.addEventListener("mouseup",   end);
-    track.addEventListener("mouseleave",end);
-
-    track.addEventListener("touchstart", start, {passive:true});
-    track.addEventListener("touchmove",  move,  {passive:true});
-    track.addEventListener("touchend",   end);
-    track.addEventListener("touchcancel",end);
+    track.style.cursor = "grabbing";
+  });
+  
+  track.addEventListener("pointermove", e => {
+    if (!isPointerDown) return;
+    const dx = e.pageX - startX;
+    track.scrollLeft = scrollStart - dx;
+  });
+  
+  track.addEventListener("pointerup", () => {
+    isPointerDown = false;
+    track.style.cursor = "grab";
+  });
+  
+  track.addEventListener("pointerleave", () => {
+    isPointerDown = false;
+    track.style.cursor = "grab";
+  });
+  
+  track.addEventListener("pointercancel", () => {
+    isPointerDown = false;
+    track.style.cursor = "grab";
+  });
+  
   })
   .catch(err => {
     console.error("❌ Gagal memuat screenshot:", err);

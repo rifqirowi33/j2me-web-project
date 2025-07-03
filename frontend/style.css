@@ -126,22 +126,17 @@ a {
 }
 
 .track {
-  display: flex;
-  overflow-x: scroll;
-  scroll-behavior: smooth;
-  cursor: pointer;
-  user-select: none;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
-  gap: 8px;
-  width: 100%;
-   -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;     /* Firefox */
+  display:flex;
+  gap:8px;
+  overflow-x:auto;          /* auto ‑ bukan hidden  */
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+  cursor:grab;
+  scrollbar-width:none;       /* Firefox */
 }
 
-.track::-webkit-scrollbar {
-  display: none;
-}
+.track::-webkit-scrollbar{ display:none; }  /* WebKit */
 
 /* track:active {
   cursor: grabbing;

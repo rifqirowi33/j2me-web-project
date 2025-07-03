@@ -83,81 +83,69 @@ fetch("/gamelist")
   track.addEventListener("mouseup", () => isDown = false);
   track.addEventListener("mouseleave", () => isDown = false);
 
-    /* ---------- Ambil screenshot ---------- */
-    fetch(`/screenshots-list/${g.folderSlug}`)
-      .then((r) => r.json())
-      .then((result) => {
-        const track = document.getElementById("track");
+  /* ---------- Ambil screenshot ---------- */
+  fetch(`/screenshots-list/${g.folderSlug}`)
+  .then(r => r.json())
+  .then(result => {
+    const track = document.getElementById("track");
 
-        if (!Array.isArray(result) || result.length === 0) {
-          track.innerHTML =
-            "<p style='color:white'>Tidak ada screenshot tersedia.</p>";
-          return;
-        }
+    if (!Array.isArray(result) || !result.length) {
+      track.innerHTML = "<p style='color:white'>Tidak ada screenshot tersedia.</p>";
+      return;
+    }
 
-        /* render gambar */
-        result.forEach((key) => {
-          const img = document.createElement("img");
-          img.src   = `/screenshot/${key}`;
-          img.alt   = "Screenshot";
-          img.onclick = () => window.open(img.src, "_blank");
-          track.appendChild(img);
-        });
+    /* render gambar */
+    result.forEach(key => {
+      const img = document.createElement("img");
+      img.src = `/screenshot/${key}`;
+      img.alt = "Screenshot";
+      img.draggable = false;          // mencegah drag‑ghost di desktop
+      img.onclick   = () => window.open(img.src, "_blank");
+      track.appendChild(img);
+    });
 
-        /* ---------- Carousel + Swipe ---------- */
-        let idx = 0;
+    /* =====================================
+       Carousel  +  Swipe / Drag             */
+    /* ===================================== */
+    let idx = 0;
+    const scrollTo = () =>
+      track.scrollTo({ left: idx * 160, behavior: "smooth" });
 
-        const scrollTo = () =>
-          track.scrollTo({ left: idx * 160, behavior: "smooth" });
+    /* Tombol panah */
+    prevBtn.onclick = () => { idx = Math.max(idx - 1, 0);               scrollTo(); };
+    nextBtn.onclick = () => { idx = Math.min(idx + 1, result.length-1); scrollTo(); };
 
-        document.getElementById("prevBtn").onclick = () => {
-          idx = Math.max(idx - 1, 0);
-          scrollTo();
-        };
-        document.getElementById("nextBtn").onclick = () => {
-          idx = Math.min(idx + 1, result.length - 1);
-          scrollTo();
-        };
+    /* Swipe ‑ touch & mouse */
+    let isDown = false, startX = 0, scrollStart = 0;
 
-        /* swipe di layar sentuh */
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-        
-        track.addEventListener("pointerdown", (e) => {
-          isDown = true;
-          track.style.cursor = "grabbing";
-          startX = e.pageX - track.offsetLeft;
-          scrollLeft = track.scrollLeft;
-        });
-        
-        track.addEventListener("pointerleave", () => {
-          isDown = false;
-          track.style.cursor = "grab";
-        });
-        
-        track.addEventListener("pointerup", () => {
-          isDown = false;
-          track.style.cursor = "grab";
-        });
-        
-        track.addEventListener("pointermove", (e) => {
-          if (!isDown) return;
-          e.preventDefault();
-          const x = e.pageX - track.offsetLeft;
-          const walk = (x - startX) * 1.5; // angka ini bisa kamu sesuaikan agar lebih/kurang geser
-          track.scrollLeft = scrollLeft - walk;
-        });
-      
-        track.addEventListener("pointercancel", () => {
-          isDragging = false;
-        });
-      })
-      .catch((err) => {
-        console.error("❌ Gagal memuat screenshot:", err);
-        document.getElementById("track").innerHTML =
-          "<p style='color:white'>Gagal memuat screenshot.</p>";
-      });
+    const start = e => {
+      isDown      = true;
+      startX      = (e.touches ? e.touches[0].pageX : e.pageX);
+      scrollStart = track.scrollLeft;
+      track.style.cursor = "grabbing";
+    };
+    const move  = e => {
+      if (!isDown) return;
+      const x = (e.touches ? e.touches[0].pageX : e.pageX);
+      track.scrollLeft = scrollStart + (startX - x);
+    };
+    const end   = () => { isDown = false; track.style.cursor = "grab"; };
+
+    track.addEventListener("mousedown", start);
+    track.addEventListener("mousemove", move);
+    track.addEventListener("mouseup",   end);
+    track.addEventListener("mouseleave",end);
+
+    track.addEventListener("touchstart", start, {passive:true});
+    track.addEventListener("touchmove",  move,  {passive:true});
+    track.addEventListener("touchend",   end);
+    track.addEventListener("touchcancel",end);
+  })
+  .catch(err => {
+    console.error("❌ Gagal memuat screenshot:", err);
+    track.innerHTML = "<p style='color:white'>Gagal memuat screenshot.</p>";
+  });
+
   })
   .catch((err) => {
     console.error("❌ Gagal memuat detail game:", err);

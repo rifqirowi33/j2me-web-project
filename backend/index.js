@@ -216,7 +216,33 @@ app.get("/game-classic", async (req, res) => {
       <style>
         body { background: black; color: white; font-family: sans-serif; padding: 14px; }
         a { color: cyan; }
-        img { max-width: 100%; margin: 6px 0; border: 1px solid #444; }
+        .carousel-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .carousel-btn {
+          background: #000;
+          color: #fff;
+          border: 1px solid #666;
+          padding: 4px 10px;
+          cursor: pointer;
+          font-size: 18px;
+        }
+        .carousel-track {
+          display: flex;
+          overflow: hidden;
+          width: 100%;
+          max-width: 100%;
+        }
+        .carousel-track img {
+          flex-shrink: 0;
+          width: 160px;
+          height: 180px;
+          object-fit: cover;
+          margin-right: 8px;
+          border: 1px solid #444;
+        }
       </style>
     </head>
     <body>
@@ -231,13 +257,47 @@ app.get("/game-classic", async (req, res) => {
 
       ${
         screenshotList.length
-          ? `<h3>Screenshot:</h3>` + screenshotList.map(src => `<p><img src="${src}"></p>`).join("")
+          ? `
+            <h3>Screenshot:</h3>
+            <div class="carousel-container">
+              <button class="carousel-btn" onclick="prev()">◀</button>
+              <div class="carousel-track" id="carouselTrack">
+                ${screenshotList.map(src => `<img src="${src}" alt="Screenshot">`).join("")}
+              </div>
+              <button class="carousel-btn" onclick="next()">▶</button>
+            </div>
+          `
           : `<p><em>(Tidak ada screenshot)</em></p>`
       }
 
       <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
       <p><em>📥 ${game.downloads} unduhan</em></p>
       <p><a href="/games-classic">← Kembali ke daftar</a></p>
+
+      <script>
+        let index = 0;
+        const track = document.getElementById("carouselTrack");
+        const images = track ? track.querySelectorAll("img") : [];
+
+        function updateScroll() {
+          if (track) {
+            track.scrollTo({
+              left: index * 168, // 160 + margin
+              behavior: 'auto'
+            });
+          }
+        }
+
+        function prev() {
+          index = Math.max(0, index - 1);
+          updateScroll();
+        }
+
+        function next() {
+          index = Math.min(images.length - 1, index + 1);
+          updateScroll();
+        }
+      </script>
     </body>
     </html>
   `;

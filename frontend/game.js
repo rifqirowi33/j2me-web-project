@@ -1,4 +1,5 @@
-const id = new URLSearchParams(location.search).get("id");
+/* frontend/game.js */
+const id        = new URLSearchParams(location.search).get("id");
 const container = document.getElementById("game-detail");
 
 if (!id || !container) {
@@ -14,7 +15,7 @@ fetch("/gamelist")
       return;
     }
 
-    // Tampilkan detail game + unduhan
+    /* ---------- markup detail ---------- */
     container.innerHTML = `
       <div class="game-box">
         <img class="cover" src="${g.cover}" alt="Cover ${g.name}" />
@@ -38,17 +39,18 @@ fetch("/gamelist")
 
       <p style="margin-top:12px;">
         <a class="dl-btn" id="downloadBtn" href="/download/${g.id}">
-        ⬇️ Unduh (${(g.size / 1024).toFixed(1)} KB)
+          ⬇️ Unduh (${(g.size / 1024).toFixed(1)} KB)
         </a>
-      </p>`;
-      
-      
-      document.getElementById("downloadBtn").addEventListener("click", () => {
-        setTimeout(() => {
-          fetch("/gamelist")
+      </p>
+    `;
+
+    /* ---------- update counter setelah unduh ---------- */
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      setTimeout(() => {
+        fetch("/gamelist")
           .then((r) => r.json())
           .then((data) => {
-            const updated = data.find(x => x.id === g.id);
+            const updated = data.find((x) => x.id === g.id);
             if (updated) {
               const info = document.querySelector(".info");
               info.innerHTML = info.innerHTML.replace(
@@ -57,48 +59,70 @@ fetch("/gamelist")
               );
             }
           });
-        }, 2000); // delay 2 detik setelah unduh
-        });
-    
-    // Ambil screenshot dari backend
+      }, 2000); // delay 2 detik
+    });
+
+    /* ---------- Ambil screenshot ---------- */
     fetch(`/screenshots-list/${g.folderSlug}`)
-    .then((r) => r.json())
-    .then((result) => {
-      
-      const track = document.getElementById("track");
-      if (!Array.isArray(result) || result.length === 0) {
-        track.innerHTML = "<p style='color:white'>Tidak ada screenshot tersedia.</p>";
-        return;
-      }
-      
-      result.forEach((key) => {
-         console.log("Menambahkan screenshot:", key);
-        const img = document.createElement("img");
-        img.src = `/screenshot/${key}`;
-        img.alt = "Screenshot";
-        img.onclick = () => window.open(img.src, "_blank");
-        track.appendChild(img);
+      .then((r) => r.json())
+      .then((result) => {
+        const track = document.getElementById("track");
+
+        if (!Array.isArray(result) || result.length === 0) {
+          track.innerHTML =
+            "<p style='color:white'>Tidak ada screenshot tersedia.</p>";
+          return;
+        }
+
+        /* render gambar */
+        result.forEach((key) => {
+          const img = document.createElement("img");
+          img.src   = `/screenshot/${key}`;
+          img.alt   = "Screenshot";
+          img.onclick = () => window.open(img.src, "_blank");
+          track.appendChild(img);
+        });
+
+        /* ---------- Carousel + Swipe ---------- */
+        let idx = 0;
+
+        const scrollTo = () =>
+          track.scrollTo({ left: idx * 160, behavior: "smooth" });
+
+        document.getElementById("prevBtn").onclick = () => {
+          idx = Math.max(idx - 1, 0);
+          scrollTo();
+        };
+        document.getElementById("nextBtn").onclick = () => {
+          idx = Math.min(idx + 1, result.length - 1);
+          scrollTo();
+        };
+
+        /* swipe di layar sentuh */
+        let startX = 0;
+        track.addEventListener("touchstart", (e) => {
+          startX = e.touches[0].clientX;
+        });
+
+        track.addEventListener("touchend", (e) => {
+          const endX   = e.changedTouches[0].clientX;
+          const deltaX = endX - startX;
+
+          if (Math.abs(deltaX) > 30) {
+            if (deltaX > 0) {
+              idx = Math.max(idx - 1, 0);               // geser ke kiri
+            } else {
+              idx = Math.min(idx + 1, result.length - 1); // geser ke kanan
+            }
+            scrollTo();
+          }
+        });
+      })
+      .catch((err) => {
+        console.error("❌ Gagal memuat screenshot:", err);
+        document.getElementById("track").innerHTML =
+          "<p style='color:white'>Gagal memuat screenshot.</p>";
       });
-
-    // Carousel
-    let idx = 0;
-    const scrollTo = () =>
-      track.scrollTo({ left: idx * 160, behavior: "smooth" });
-    document.getElementById("prevBtn").onclick = () => {
-      idx = Math.max(idx - 1, 0);
-      scrollTo();
-    };
-    document.getElementById("nextBtn").onclick = () => {
-      idx = Math.min(idx + 1, result.length - 1);
-      scrollTo();
-    };
-  })
-  .catch((err) => {
-    console.error("❌ Gagal memuat screenshot:", err);
-    document.getElementById("track").innerHTML =
-      "<p style='color:white'>Gagal memuat screenshot.</p>";
-  });
-
   })
   .catch((err) => {
     console.error("❌ Gagal memuat detail game:", err);

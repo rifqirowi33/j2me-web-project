@@ -114,6 +114,7 @@ a {
   display: flex;
   align-items: center;
   gap: 5px;
+  overflow: visible;
 }
 
 .carousel button {
@@ -131,17 +132,15 @@ a {
   cursor: pointer;
   user-select: none;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   gap: 8px;
   width: 100%;
+   -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
 .track::-webkit-scrollbar {
   display: none;
-}
-
-.track {
-  -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;     /* Firefox */
 }
 
 /* track:active {

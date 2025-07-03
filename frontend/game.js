@@ -62,6 +62,27 @@ fetch("/gamelist")
       }, 2000); // delay 2 detik
     });
 
+    const track = document.getElementById("track");
+    let startX = 0, scrollStart = 0;
+    track.addEventListener("touchstart", e => {
+      startX = e.touches[0].pageX;
+      scrollStart = track.scrollLeft;
+    });
+    track.addEventListener("touchmove", e => {
+      const delta = startX - e.touches[0].pageX;
+      track.scrollLeft = scrollStart + delta;
+    });
+
+    let isDown = false;
+    track.addEventListener("mousedown", e => { isDown = true; startX = e.pageX; scrollStart = track.scrollLeft; });
+    track.addEventListener("mousemove", e => {
+      if (!isDown) return;
+      const delta = startX - e.pageX;
+    track.scrollLeft = scrollStart + delta;
+  });
+  track.addEventListener("mouseup", () => isDown = false);
+  track.addEventListener("mouseleave", () => isDown = false);
+
     /* ---------- Ambil screenshot ---------- */
     fetch(`/screenshots-list/${g.folderSlug}`)
       .then((r) => r.json())

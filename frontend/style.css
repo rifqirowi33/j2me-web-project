@@ -126,23 +126,34 @@ a {
 
 .track {
   display: flex;
-  overflow-x: hidden;
+  overflow-x: auto;
   scroll-behavior: smooth;
-  cursor: grab;
-  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 8px;
   width: 100%;
 }
 
-track:active {
-  cursor: grabbing;
+.track::-webkit-scrollbar {
+  display: none;
 }
 
+.track {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+/* track:active {
+  cursor: grabbing;
+} */
+
 .track img {
-  width: 160px;
+  max-width: 160px;
   height: 180px;
   object-fit: cover;
-  cursor: pointer;
   border: 1px solid rgb(255, 255, 255);
+  flex-shrink: 0;
 }
 
 /* tombol download */

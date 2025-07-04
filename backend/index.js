@@ -183,127 +183,127 @@ app.get("/", (req, res) => {
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
 
-app.get("/game-classic", async (req, res) => {
-  const id = req.query.id;
-  const game = readGames().find((g) => g.id === id);
+// app.get("/game-classic", async (req, res) => {
+//   const id = req.query.id;
+//   const game = readGames().find((g) => g.id === id);
 
-  if (!game) {
-    return res.send("<h2>Game tidak ditemukan</h2>");
-  }
+//   if (!game) {
+//     return res.send("<h2>Game tidak ditemukan</h2>");
+//   }
 
-  // Ambil screenshot dari R2
-  let screenshotList = [];
-  try {
-    const prefix = `screenshots/${game.folderSlug}/`;
-    const result = await s3.send(new ListObjectsV2Command({
-      Bucket: process.env.R2_BUCKET_NAME,
-      Prefix: prefix,
-    }));
-    screenshotList = (result.Contents || [])
-      .map((obj) => obj.Key)
-      .filter((key) => /\.(png|jpe?g|gif)$/i.test(key))
-      .map((key) => `/screenshot/${key}`);
-  } catch (err) {
-    console.error("❌ Gagal ambil screenshot:", err.message);
-  }
+//   // Ambil screenshot dari R2
+//   let screenshotList = [];
+//   try {
+//     const prefix = `screenshots/${game.folderSlug}/`;
+//     const result = await s3.send(new ListObjectsV2Command({
+//       Bucket: process.env.R2_BUCKET_NAME,
+//       Prefix: prefix,
+//     }));
+//     screenshotList = (result.Contents || [])
+//       .map((obj) => obj.Key)
+//       .filter((key) => /\.(png|jpe?g|gif)$/i.test(key))
+//       .map((key) => `/screenshot/${key}`);
+//   } catch (err) {
+//     console.error("❌ Gagal ambil screenshot:", err.message);
+//   }
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8" />
-      <title>${game.name}</title>
-      <style>
-        body { background: black; color: white; font-family: sans-serif; padding: 14px; }
-        a { color: cyan; }
-        .carousel-container {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .carousel-btn {
-          background: #000;
-          color: #fff;
-          border: 1px solid #666;
-          padding: 4px 10px;
-          cursor: pointer;
-          font-size: 18px;
-        }
-        .carousel-track {
-          display: flex;
-          overflow: hidden;
-          width: 100%;
-          max-width: 100%;
-        }
-        .carousel-track img {
-          flex-shrink: 0;
-          width: 160px;
-          height: 180px;
-          object-fit: cover;
-          margin-right: 8px;
-          border: 1px solid #444;
-        }
-      </style>
-    </head>
-    <body>
-      <h2>${game.name}</h2>
-      <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
-      <p><strong>Tahun:</strong> ${game.year}</p>
-      <p><strong>Layar:</strong> ${game.screen}</p>
-      <p><strong>Mod:</strong> ${game.mod}</p>
-      <p><strong>Vendor:</strong> ${game.vendor}</p>
-      <p><strong>Total Diunduh:</strong> ${game.downloads} kali</p>
-      <p><strong>Deskripsi:</strong><br><br> ${game.description} </p><br>
+//   const html = `
+//     <!DOCTYPE html>
+//     <html>
+//     <head>
+//       <meta charset="UTF-8" />
+//       <title>${game.name}</title>
+//       <style>
+//         body { background: black; color: white; font-family: sans-serif; padding: 14px; }
+//         a { color: cyan; }
+//         .carousel-container {
+//           display: flex;
+//           align-items: center;
+//           gap: 10px;
+//         }
+//         .carousel-btn {
+//           background: #000;
+//           color: #fff;
+//           border: 1px solid #666;
+//           padding: 4px 10px;
+//           cursor: pointer;
+//           font-size: 18px;
+//         }
+//         .carousel-track {
+//           display: flex;
+//           overflow: hidden;
+//           width: 100%;
+//           max-width: 100%;
+//         }
+//         .carousel-track img {
+//           flex-shrink: 0;
+//           width: 160px;
+//           height: 180px;
+//           object-fit: cover;
+//           margin-right: 8px;
+//           border: 1px solid #444;
+//         }
+//       </style>
+//     </head>
+//     <body>
+//       <h2>${game.name}</h2>
+//       <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
+//       <p><strong>Tahun:</strong> ${game.year}</p>
+//       <p><strong>Layar:</strong> ${game.screen}</p>
+//       <p><strong>Mod:</strong> ${game.mod}</p>
+//       <p><strong>Vendor:</strong> ${game.vendor}</p>
+//       <p><strong>Total Diunduh:</strong> ${game.downloads} kali</p>
+//       <p><strong>Deskripsi:</strong><br><br> ${game.description} </p><br>
 
-      ${
-        screenshotList.length
-          ? `
-            <h3>Screenshot:</h3>
-            <div class="carousel-container">
-              <button class="carousel-btn" onclick="prev()">◀</button>
-              <div class="carousel-track" id="carouselTrack">
-                ${screenshotList.map(src => `<img src="${src}" alt="Screenshot">`).join("")}
-              </div>
-              <button class="carousel-btn" onclick="next()">▶</button>
-            </div>
-          `
-          : `<p><em>(Tidak ada screenshot)</em></p>`
-      }
+//       ${
+//         screenshotList.length
+//           ? `
+//             <h3>Screenshot:</h3>
+//             <div class="carousel-container">
+//               <button class="carousel-btn" onclick="prev()">◀</button>
+//               <div class="carousel-track" id="carouselTrack">
+//                 ${screenshotList.map(src => `<img src="${src}" alt="Screenshot">`).join("")}
+//               </div>
+//               <button class="carousel-btn" onclick="next()">▶</button>
+//             </div>
+//           `
+//           : `<p><em>(Tidak ada screenshot)</em></p>`
+//       }
 
-      <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
-      <p><em>📥 ${game.downloads} unduhan</em></p>
-      <p><a href="/games-classic">← Kembali ke daftar</a></p>
+//       <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
+//       <p><em>📥 ${game.downloads} unduhan</em></p>
+//       <p><a href="/games-classic">← Kembali ke daftar</a></p>
 
-      <script>
-        let index = 0;
-        const track = document.getElementById("carouselTrack");
-        const images = track ? track.querySelectorAll("img") : [];
+//       <script>
+//         let index = 0;
+//         const track = document.getElementById("carouselTrack");
+//         const images = track ? track.querySelectorAll("img") : [];
 
-        function updateScroll() {
-          if (track) {
-            track.scrollTo({
-              left: index * 168, // 160 + margin
-              behavior: 'auto'
-            });
-          }
-        }
+//         function updateScroll() {
+//           if (track) {
+//             track.scrollTo({
+//               left: index * 168, // 160 + margin
+//               behavior: 'auto'
+//             });
+//           }
+//         }
 
-        function prev() {
-          index = Math.max(0, index - 1);
-          updateScroll();
-        }
+//         function prev() {
+//           index = Math.max(0, index - 1);
+//           updateScroll();
+//         }
 
-        function next() {
-          index = Math.min(images.length - 1, index + 1);
-          updateScroll();
-        }
-      </script>
-    </body>
-    </html>
-  `;
+//         function next() {
+//           index = Math.min(images.length - 1, index + 1);
+//           updateScroll();
+//         }
+//       </script>
+//     </body>
+//     </html>
+//   `;
 
-  res.send(html);
-});
+//   res.send(html);
+// });
 
 // untuk tampilan operamini, symbian, hp java
 
@@ -342,6 +342,65 @@ app.get("/game-classic", async (req, res) => {
 
 //   res.send(html);
 // });
+
+app.get("/game-classic", async (req, res) => {
+  const id   = req.query.id;
+  const game = readGames().find(g => g.id === id);
+  if (!game) return res.send("<h2>Game tidak ditemukan</h2>");
+
+  /* ── ambil daftar screenshot di R2 ───────────────────────── */
+  let screenshotList = [];
+  try {
+    const prefix  = `screenshots/${game.folderSlug}/`;
+    const result  = await s3.send(new ListObjectsV2Command({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Prefix: prefix,
+    }));
+    screenshotList = (result.Contents || [])
+      .map(o => o.Key)
+      .filter(k => /\.(png|jpe?g|gif)$/i.test(k))
+      .map(k => `/screenshot/${k}`);
+  } catch (e) {
+    console.error("❌ Gagal ambil screenshot:", e.message);
+  }
+
+  /* ── HTML ─────────────────────────────────────────────────── */
+  res.send(/*html*/`
+<!DOCTYPE html>
+<html><head>
+  <meta charset="utf-8">
+  <title>${game.name}</title>
+  <style>
+    body {background:#000;color:#fff;font-family:sans-serif;padding:12px;}
+    a    {color:cyan}
+    img  {border:1px solid #444;margin:6px 0;}
+  </style>
+</head><body>
+  <h2>${game.name}</h2>
+  <p><img src="${game.cover}" width="150" alt="cover"></p>
+
+  <p><strong>Tahun:</strong> ${game.year}</p>
+  <p><strong>Layar:</strong> ${game.screen}</p>
+  <p><strong>Mod:</strong> ${game.mod}</p>
+  <p><strong>Vendor:</strong> ${game.vendor}</p>
+  <p><strong>Diunduh:</strong> ${game.downloads}×</p>
+  <p><strong>Deskripsi:</strong><br>${game.description}</p>
+
+  ${screenshotList.length
+      ? `<h3>Screenshot</h3>` +
+        screenshotList.map(src => `
+            <p>
+              <img src="${src}" width="160"
+                   onclick="this.width=this.width==160?document.body.clientWidth:this.width=160">
+            </p>`).join("")
+      : `<p><em>(Tidak ada screenshot)</em></p>`}
+
+  <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size/1024).toFixed(1)} KB)</a></p>
+  <p><a href="/games-classic">← Kembali ke daftar</a></p>
+</body></html>
+  `);
+});
+
 app.get("/games-classic", (req, res) => {
   const list = games.map(game => `
     <li style="margin-bottom:10px;display:flex;align-items:center;">

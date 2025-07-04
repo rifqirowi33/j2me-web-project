@@ -306,14 +306,50 @@ app.get("/game-classic", async (req, res) => {
 });
 
 // untuk tampilan operamini, symbian, hp java
+
+// app.get("/games-classic", (req, res) => {
+//   const list = games.map(game => `
+//     <li style="margin-bottom:10px;display:flex;align-items:center;">
+//     <img src="/icon/${game.icon}" alt="" width="24" height="24"
+//     style="margin-right:6px;border:1px solid #444">
+//     <a href="/game-classic?id=${game.id}">
+//     <b>${game.name}</b> (${game.year})
+//     </a>
+//     </li>
+//   `).join("");
+
+//   const html = `
+//     <!DOCTYPE html>
+//     <html>
+//     <head>
+//       <title>JAVA REPP.MY.ID</title>
+//       <meta charset="utf-8">
+//       <style>
+//         body { background: black; color: white; font-family: sans-serif; padding: 10px; }
+//         a { color: #0ff; }
+//         img { max-width: 100px; height: auto; margin: 2px; border: 1px solid #444; }
+//       </style>
+//     </head>
+//     <body>
+//       <h2>📟JAVA REPP.MY.ID</h2>
+//       <p>mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail Game</p>
+//       <ul>${list}</ul>
+//       <hr>
+//       <small>&copy; 2025 java.repp.my.id</small>
+//     </body>
+//     </html>
+//   `;
+
+//   res.send(html);
+// });
 app.get("/games-classic", (req, res) => {
   const list = games.map(game => `
     <li style="margin-bottom:10px;display:flex;align-items:center;">
-    <img src="/icon/${game.icon}" alt="" width="24" height="24"
-    style="margin-right:6px;border:1px solid #444">
-    <a href="/game-classic?id=${game.id}">
-    <b>${game.name}</b> (${game.year})
-    </a>
+      <img src="/icon/${game.icon || 'default.png'}" alt="icon" width="24" height="24"
+        style="margin-right:6px;border:1px solid #444;border-radius:4px">
+      <a href="/game-classic?id=${game.id}">
+        <b>${game.name}</b> (${game.year})
+      </a>
     </li>
   `).join("");
 
@@ -325,14 +361,15 @@ app.get("/games-classic", (req, res) => {
       <meta charset="utf-8">
       <style>
         body { background: black; color: white; font-family: sans-serif; padding: 10px; }
-        a { color: #0ff; }
-        img { max-width: 100px; height: auto; margin: 2px; border: 1px solid #444; }
+        a { color: #0ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        img { vertical-align: middle; }
       </style>
     </head>
     <body>
-      <h2>📟JAVA REPP.MY.ID</h2>
-      <p>mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail Game</p>
-      <ul>${list}</ul>
+      <h2>📟 JAVA REPP.MY.ID</h2>
+      <p>Mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail game</p>
+      <ul style="list-style:none;padding:0">${list}</ul>
       <hr>
       <small>&copy; 2025 java.repp.my.id</small>
     </body>

@@ -26,9 +26,25 @@
     "vendor": "QQ Tencent",
     "downloads": 0,
     "description": "Game Beat'em Up seru dengan efek pertarungan yang fantastis dalam genggaman ponselmu!",
-    "cover": "/image/Legend_Of_Martial_Cover.png",
-    "screenshotFolder": "screenshots/legendofmartial",
-    "folderSlug": "legendofmartial",
+    "cover": "/image/Fist_Of_Fury_Cover.png",
+    "screenshotFolder": "screenshots/fistoffuryTencent",
+    "folderSlug": "fistoffuryTencent",
     "icon": "legendmartialarts-icon.png"
+  },
+  {
+    "id": "the-farm-2",
+    "name": "The Farm 2 : A World We Grow Together Indonesia [Coming Soon!]",
+    "key": "games/TheFarm2Notes.jar",
+    "size": 7200000,
+    "year": 2025,
+    "screen": "240×320",
+    "mod": "Dalam Pengerjaan",
+    "vendor": "COM 2 US",
+    "downloads": 1,
+    "description": "Game Bertani, Beternak, Berkebun, Menikah dalam genggaman Ponsel mu [Coming soon!]",
+    "cover": "/image/The_Farm_2_Cover.png",
+    "screenshotFolder": "screenshots/thefarm2",
+    "folderSlug": "thefarm2",
+    "icon": "thefarm2-icon.png"
   }
 ]

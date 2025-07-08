@@ -73,104 +73,6 @@ app.get("/games", (req, res) => {
   `);
 });
 
-// app.get("/games", (req, res) => {
-//   const games = readGames();
-
-//   const list = games.map((g) => `
-//     <li style="margin-bottom: 8px;">
-//       📦 <a href="/game?id=${g.id}" style="color:#0ff;text-decoration:none;">
-//         ${g.name}
-//       </a> (${g.year})
-//     </li>
-//   `).join("");
-
-//   res.send(`
-//     <!DOCTYPE html>
-//     <html lang="id">
-//     <head>
-//       <meta charset="UTF-8" />
-//       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-//       <title>Daftar Game Java</title>
-//       <link rel="stylesheet" href="/style.css" />
-//       <style>
-//         body {
-//           background: black;
-//           color: white;
-//           font-family: sans-serif;
-//           padding: 20px;
-//         }
-//         a {
-//           color: #0ff;
-//           text-decoration: none;
-//         }
-//         a:hover {
-//           text-decoration: underline;
-//         }
-//         ul {
-//           list-style: none;
-//           padding: 0;
-//         }
-//       </style>
-//     </head>
-//     <body>
-//       <h1>📱 Daftar Game Java</h1>
-//       <p>Temukan dan unduh game Java favoritmu!</p>
-//       <hr>
-//       <ul>
-//         ${list}
-//       </ul>
-//       <hr>
-//       <p><a href="/">← Kembali ke Beranda</a></p>
-//       <footer><small>© 2025 JAVA.REPP.MY.ID</small></footer>
-//     </body>
-//     </html>
-//   `);
-// });
-
-// app.get("/games", (req, res) => {
-//   const games = readGames();
-
-//   const list = games.map((g) => `
-//     <div class="game-box" style="display:flex;gap:12px;margin-bottom:20px;align-items:center;">
-//       <img src="${g.cover}" alt="Cover ${g.name}" width="80" height="80" style="border-radius:12px;border:1px solid #ccc;" />
-//       <div>
-//         <h3 style="margin:0 0 6px 0;">📦 <a href="/game?id=${g.id}" style="text-decoration:none;color:#0ff">${g.name}</a></h3>
-//         <p style="margin:0;font-size:14px;">
-//           Tahun: ${g.year} | Ukuran: ${g.screen}<br>
-//           Mod: ${g.mod} | Vendor: ${g.vendor}<br>
-//           <strong>📥 ${g.downloads} unduhan</strong>
-//         </p>
-//       </div>
-//     </div>
-//   `).join("");
-
-//   res.send(`
-//     <!DOCTYPE html>
-//     <html lang="id">
-//     <head>
-//       <meta charset="UTF-8" />
-//       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-//       <title>Daftar Game Java</title>
-//       <link rel="stylesheet" href="/style.css" />
-//       <style>
-//         body { background: black; color: white; font-family: sans-serif; padding: 20px; }
-//         a { color: #0ff; text-decoration: none; }
-//         a:hover { text-decoration: underline; }
-//       </style>
-//     </head>
-//     <body>
-//       <h1>📱 Daftar Game Java</h1>
-//       <p>Temukan dan unduh game Java favoritmu!</p>
-//       <hr style="border: 1px solid #333; margin: 12px 0;">
-//       ${list}
-//       <hr>
-//       <p><a href="/">← Kembali ke Beranda</a></p>
-//       <footer><small>© 2025 JAVA.REPP.MY.ID</small></footer>
-//     </body>
-//     </html>
-//   `);
-// });
-
 app.get("/gamelist", (_req, res) => {
   res.json(readGames());
 });
@@ -182,166 +84,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/game", (_req, res) => res.sendFile(path.join(FRONTEND_PATH, "game.html")));
-
-// app.get("/game-classic", async (req, res) => {
-//   const id = req.query.id;
-//   const game = readGames().find((g) => g.id === id);
-
-//   if (!game) {
-//     return res.send("<h2>Game tidak ditemukan</h2>");
-//   }
-
-//   // Ambil screenshot dari R2
-//   let screenshotList = [];
-//   try {
-//     const prefix = `screenshots/${game.folderSlug}/`;
-//     const result = await s3.send(new ListObjectsV2Command({
-//       Bucket: process.env.R2_BUCKET_NAME,
-//       Prefix: prefix,
-//     }));
-//     screenshotList = (result.Contents || [])
-//       .map((obj) => obj.Key)
-//       .filter((key) => /\.(png|jpe?g|gif)$/i.test(key))
-//       .map((key) => `/screenshot/${key}`);
-//   } catch (err) {
-//     console.error("❌ Gagal ambil screenshot:", err.message);
-//   }
-
-//   const html = `
-//     <!DOCTYPE html>
-//     <html>
-//     <head>
-//       <meta charset="UTF-8" />
-//       <title>${game.name}</title>
-//       <style>
-//         body { background: black; color: white; font-family: sans-serif; padding: 14px; }
-//         a { color: cyan; }
-//         .carousel-container {
-//           display: flex;
-//           align-items: center;
-//           gap: 10px;
-//         }
-//         .carousel-btn {
-//           background: #000;
-//           color: #fff;
-//           border: 1px solid #666;
-//           padding: 4px 10px;
-//           cursor: pointer;
-//           font-size: 18px;
-//         }
-//         .carousel-track {
-//           display: flex;
-//           overflow: hidden;
-//           width: 100%;
-//           max-width: 100%;
-//         }
-//         .carousel-track img {
-//           flex-shrink: 0;
-//           width: 160px;
-//           height: 180px;
-//           object-fit: cover;
-//           margin-right: 8px;
-//           border: 1px solid #444;
-//         }
-//       </style>
-//     </head>
-//     <body>
-//       <h2>${game.name}</h2>
-//       <p><img src="${game.cover}" alt="Cover Game" width="150"></p>
-//       <p><strong>Tahun:</strong> ${game.year}</p>
-//       <p><strong>Layar:</strong> ${game.screen}</p>
-//       <p><strong>Mod:</strong> ${game.mod}</p>
-//       <p><strong>Vendor:</strong> ${game.vendor}</p>
-//       <p><strong>Total Diunduh:</strong> ${game.downloads} kali</p>
-//       <p><strong>Deskripsi:</strong><br><br> ${game.description} </p><br>
-
-//       ${
-//         screenshotList.length
-//           ? `
-//             <h3>Screenshot:</h3>
-//             <div class="carousel-container">
-//               <button class="carousel-btn" onclick="prev()">◀</button>
-//               <div class="carousel-track" id="carouselTrack">
-//                 ${screenshotList.map(src => `<img src="${src}" alt="Screenshot">`).join("")}
-//               </div>
-//               <button class="carousel-btn" onclick="next()">▶</button>
-//             </div>
-//           `
-//           : `<p><em>(Tidak ada screenshot)</em></p>`
-//       }
-
-//       <p><a href="/download/${game.id}">⬇️ Unduh (${(game.size / 1024).toFixed(1)} KB)</a></p>
-//       <p><em>📥 ${game.downloads} unduhan</em></p>
-//       <p><a href="/games-classic">← Kembali ke daftar</a></p>
-
-//       <script>
-//         let index = 0;
-//         const track = document.getElementById("carouselTrack");
-//         const images = track ? track.querySelectorAll("img") : [];
-
-//         function updateScroll() {
-//           if (track) {
-//             track.scrollTo({
-//               left: index * 168, // 160 + margin
-//               behavior: 'auto'
-//             });
-//           }
-//         }
-
-//         function prev() {
-//           index = Math.max(0, index - 1);
-//           updateScroll();
-//         }
-
-//         function next() {
-//           index = Math.min(images.length - 1, index + 1);
-//           updateScroll();
-//         }
-//       </script>
-//     </body>
-//     </html>
-//   `;
-
-//   res.send(html);
-// });
-
-// untuk tampilan operamini, symbian, hp java
-
-// app.get("/games-classic", (req, res) => {
-//   const list = games.map(game => `
-//     <li style="margin-bottom:10px;display:flex;align-items:center;">
-//     <img src="/icon/${game.icon}" alt="" width="24" height="24"
-//     style="margin-right:6px;border:1px solid #444">
-//     <a href="/game-classic?id=${game.id}">
-//     <b>${game.name}</b> (${game.year})
-//     </a>
-//     </li>
-//   `).join("");
-
-//   const html = `
-//     <!DOCTYPE html>
-//     <html>
-//     <head>
-//       <title>JAVA REPP.MY.ID</title>
-//       <meta charset="utf-8">
-//       <style>
-//         body { background: black; color: white; font-family: sans-serif; padding: 10px; }
-//         a { color: #0ff; }
-//         img { max-width: 100px; height: auto; margin: 2px; border: 1px solid #444; }
-//       </style>
-//     </head>
-//     <body>
-//       <h2>📟JAVA REPP.MY.ID</h2>
-//       <p>mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail Game</p>
-//       <ul>${list}</ul>
-//       <hr>
-//       <small>&copy; 2025 java.repp.my.id</small>
-//     </body>
-//     </html>
-//   `;
-
-//   res.send(html);
-// });
 
 app.get("/game-classic", async (req, res) => {
   const id   = req.query.id;
@@ -552,6 +294,31 @@ app.get("/icon/:filename", async (req, res) => {
   } catch (err) {
     console.error("❌ Icon error:", err);
     res.status(404).send("Icon not found");
+  }
+});
+
+app.use(express.json());
+
+app.post("/api/add-game", (req, res) => {
+  try {
+    const newGame = req.body;
+    const games = readGames();
+
+    if (!newGame.id || !newGame.name) {
+      return res.status(400).json({ error: "ID dan nama harus diisi" });
+    }
+
+    const exists = games.find(g => g.id === newGame.id);
+    if (exists) {
+      return res.status(409).json({ error: "ID game sudah ada" });
+    }
+
+    games.push(newGame);
+    fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 2));
+    res.json({ success: true, message: "Game berhasil ditambahkan!" });
+  } catch (err) {
+    console.error("❌ Gagal menambah game:", err);
+    res.status(500).json({ error: "Terjadi kesalahan saat menambah game" });
   }
 });
 

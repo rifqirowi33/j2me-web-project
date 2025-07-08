@@ -16,13 +16,13 @@
     "icon": "monsterhunter-icon.png"
   },
   {
-    "id": "legend-of-martial-arts",
-    "name": "Legend Of Martial Arts",
-    "key": "games/Legend_Of Martial_Arts_240x320.jar",
-    "size": 1010000,
+    "id": "fist-of-fury",
+    "name": "Fist Of Fury [Tencent QQ] Bahasa Indonesia",
+    "key": "games/Fist_Of_Fury_TencentQQ_Indonesia_240x320.jar",
+    "size": 1080000,
     "year": 2025,
     "screen": "240×320",
-    "mod": "Bahasa Indonesia 100% hanya cerita",
+    "mod": "Bahasa Indonesia 100% dari UI hingga keseluruhan Cerita",
     "vendor": "QQ Tencent",
     "downloads": 0,
     "description": "Game Beat'em Up seru dengan efek pertarungan yang fantastis dalam genggaman ponselmu!",

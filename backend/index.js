@@ -299,6 +299,15 @@ app.get("/icon/:filename", async (req, res) => {
 
 app.use(express.json());
 
+app.get("/api/check-password", (req, res) => {
+  const input = req.query.password;
+  if (input === process.env.ADMIN_PASSWORD) {
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ error: "Password salah" });
+  }
+});
+
 app.get("/api/add-game-safe", (req, res) => {
   const { password, id, name } = req.query;
 

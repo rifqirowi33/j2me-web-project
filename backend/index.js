@@ -299,9 +299,23 @@ app.get("/icon/:filename", async (req, res) => {
 
 app.use(express.json());
 
-app.get("/api/check-password", (req, res) => {
-  const input = req.query.password;
-  if (input === process.env.ADMIN_PASSWORD) {
+app.get("/api/admin-status", (req, res) => {
+  const password = req.query.password;
+
+  if (!password) {
+    return res.status(400).json({ status: "no-password", message: "Password tidak diberikan" });
+  }
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ status: "wrong-password", message: "Password salah" });
+  }
+
+  res.json({ status: "ok", message: "Terhubung sebagai admin" });
+});
+
+app.get("/api/dashboard", (req, res) => {
+  const pwd = req.query.password;
+  if (pwd === process.env.ADMIN_PASSWORD) {
     res.json({ success: true });
   } else {
     res.status(401).json({ error: "Password salah" });

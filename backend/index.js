@@ -314,6 +314,13 @@ app.get("/api/admin-status", (req, res) => {
 });
 
 app.get("/api/dashboard", (req, res) => {
+  const password = req.query.password;
+  if (!password) return res.status(400).json({ error: "Password wajib diisi" });
+  if (password !== process.env.ADMIN_PASSWORD) return res.status(401).json({ error: "Password salah" });
+  res.json({ success: true, message: "Password benar, akses diberikan" });
+});
+
+app.get("/api/check-password", (req, res) => {
   const pwd = req.query.password;
   if (pwd === process.env.ADMIN_PASSWORD) {
     res.json({ success: true });

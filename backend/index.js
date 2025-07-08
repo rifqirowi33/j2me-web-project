@@ -18,6 +18,7 @@ import { incrementDownload } from "./games.js";
 const s3 = createS3Client(process.env);
 
 const app  = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3535;
 
 import fs from "fs"; // di bagian atas
@@ -296,8 +297,6 @@ app.get("/icon/:filename", async (req, res) => {
     res.status(404).send("Icon not found");
   }
 });
-
-app.use(express.json());
 
 app.post("/api/add-game", (req, res) => {
   try {

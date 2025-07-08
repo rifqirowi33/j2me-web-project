@@ -299,27 +299,27 @@ app.get("/icon/:filename", async (req, res) => {
 
 app.use(express.json());
 
-app.post("/8585/add-game", (req, res) => {
-  try {
-    const newGame = req.body;
-    const games = readGames();
 
-    if (!newGame.id || !newGame.name) {
-      return res.status(400).json({ error: "ID dan nama harus diisi" });
-    }
+app.get("/api/update-game-safe", (req, res) => {
+  const { password, id, ...updateFields } = req.query;
 
-    const exists = games.find(g => g.id === newGame.id);
-    if (exists) {
-      return res.status(409).json({ error: "ID game sudah ada" });
-    }
-
-    games.push(newGame);
-    fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 2));
-    res.json({ success: true, message: "Game berhasil ditambahkan!" });
-  } catch (err) {
-    console.error("❌ Gagal menambah game:", err);
-    res.status(500).json({ error: "Terjadi kesalahan saat menambah game" });
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(403).json({ error: "Password salah" });
   }
+
+  if (!id) {
+    return res.status(400).json({ error: "ID game wajib diisi" });
+  }
+
+  const games = readGames();
+  const game = games.find(g => g.id === id);
+  if (!game) {
+    return res.status(404).json({ error: "Game tidak ditemukan" });
+  }
+
+  Object.assign(game, updateFields);
+  fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 2));
+  res.json({ success: true, message: "Game berhasil diperbarui", game });
 });
 
 app.listen(PORT, () =>

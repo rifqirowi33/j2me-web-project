@@ -299,6 +299,44 @@ app.get("/icon/:filename", async (req, res) => {
 
 app.use(express.json());
 
+app.get("/api/add-game-safe", (req, res) => {
+  const { password, id, name } = req.query;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Password salah" });
+  }
+
+  if (!id || !name) {
+    return res.status(400).json({ error: "ID dan nama wajib diisi" });
+  }
+
+  const games = readGames();
+  const exists = games.find(g => g.id === id);
+  if (exists) {
+    return res.status(409).json({ error: "ID game sudah ada" });
+  }
+
+  const newGame = {
+    id,
+    name,
+    key: "",
+    size: 0,
+    year: 2025,
+    screen: "",
+    mod: "",
+    vendor: "",
+    downloads: 0,
+    description: "",
+    cover: "",
+    screenshotFolder: "",
+    folderSlug: "",
+    icon: "default.png"
+  };
+
+  games.push(newGame);
+  fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 2));
+  res.json({ success: true, message: "Game berhasil ditambahkan!" });
+});
 
 app.get("/api/update-game-safe", (req, res) => {
   const { password, id, ...updateFields } = req.query;
@@ -321,6 +359,7 @@ app.get("/api/update-game-safe", (req, res) => {
   fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 2));
   res.json({ success: true, message: "Game berhasil diperbarui", game });
 });
+
 
 app.listen(PORT, () =>
   console.log(`✅ Server berjalan di http://localhost:${PORT}`)

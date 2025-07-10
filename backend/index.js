@@ -87,7 +87,7 @@ app.get("/gamelist.txt", (req, res) => {
     const year  = game.year;
     const desc  = (game.description || "").replace(/\n/g, " ").replace(/\|/g, "-"); // hindari newline & |
     const cover = "https://java.repp.my.id" + game.cover;
-    const icon  = "https://java.repp.my.id/image/icon/" + game.icon;
+    const icon  = "https://java.repp.my.id/icon/" + game.icon;
 
     return `${name}|${url}|${size}|${year}|${desc}|${cover}|${icon}`;
   });

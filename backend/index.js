@@ -77,6 +77,24 @@ app.get("/gamelist", (_req, res) => {
   res.json(readGames());
 });
 
+app.get("/gamelist.txt", (req, res) => {
+  const games = readGames();
+
+  const lines = games.map(game => {
+    const name  = game.name;
+    const url   = "https://java.repp.my.id/" + game.key;
+    const size  = game.size;
+    const year  = game.year;
+    const desc  = (game.description || "").replace(/\n/g, " ").replace(/\|/g, "-"); // hindari newline & |
+    const cover = "https://java.repp.my.id" + game.cover;
+    const icon  = "https://java.repp.my.id/image/icon/" + game.icon;
+
+    return `${name}|${url}|${size}|${year}|${desc}|${cover}|${icon}`;
+  });
+
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.send(lines.join("\n") + "\n");
+});
 
 // fallback: kalau user buka '/', tampilkan index.html dari /frontend
 app.get("/", (req, res) => {

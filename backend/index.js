@@ -65,7 +65,7 @@ app.get("/games", (req, res) => {
       </main>
 
       <footer>
-        <p>© 2025 JAVA.REPP.MY.ID</p>
+        <p>© 2025 <a href="https://java.repp.my.id">JAVA.REPP.MY.ID</a></p>
       </footer>
 
     </body>
@@ -190,7 +190,7 @@ app.get("/games-classic", (req, res) => {
       <p>Mendukung Opera Mini dan HP Jadul! Klik judul untuk melihat detail game</p>
       <ul style="list-style:none;padding:0">${list}</ul>
       <hr>
-      <small>&copy; 2025 java.repp.my.id</small>
+      <small>&copy; 2025 java.repp.my.id </small>
     </body>
     </html>
   `;

@@ -82,12 +82,12 @@ app.get("/gamelist.txt", (req, res) => {
 
   const lines = games.map(game => {
     const name  = game.name;
-    const url   = "https://java.repp.my.id/download/" + game.id;
+    const url   = "http://java.repp.my.id/download/" + game.id;
     const size  = game.size;  
     const screen  = game.screen;
     const desc  = (game.description || "").replace(/\n/g, " ").replace(/\|/g, "-"); // hindari newline & |
-    const cover = "https://java.repp.my.id" + game.cover;
-    const icon  = "https://java.repp.my.id/icon/" + game.icon;
+    const cover = "http://java.repp.my.id" + game.cover;
+    const icon  = "http://java.repp.my.id/icon/" + game.icon;
 
     return `${name}|${url}|${size}|${screen}|${desc}|${cover}|${icon}`;
   });

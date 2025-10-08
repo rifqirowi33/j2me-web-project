@@ -2,23 +2,74 @@ import mime from "mime-types";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-
-dotenv.config({ path: path.resolve(__dirname, "config.env") });
-
+import useragent from "express-useragent";
+import requestIp from "request-ip";
 import express from "express";
 import { ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createS3Client } from "./r2client.js";
 import { games } from "./games.js";
 import { incrementDownload } from "./games.js";
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "config.env") });
+
 // Setelah dotenv dimuat, baru buat client S3
 const s3 = createS3Client(process.env);
 
 const app  = express();
 const PORT = process.env.PORT || 3535;
+
+// Middleware deteksi HTTPS dan perangkat
+app.use(useragent.express());
+
+// Lokasi file log
+const logFile = path.join(process.cwd(), "redirect.log");
+
+// Fungsi sederhana untuk menulis log ke file
+function writeRedirectLog(entry) {
+  const line = `[${new Date().toISOString()}] ${entry}\n`;
+  fs.appendFile(logFile, line, (err) => {
+    if (err) console.error("Gagal menulis log redirect:", err);
+  });
+}
+
+app.use((req, res, next) => {
+  const host = req.headers.host || "";
+  const proto = req.headers["x-forwarded-proto"] || req.protocol;
+  const ua = (req.headers["user-agent"] || "").toLowerCase();
+  const ip = requestIp.getClientIp(req) || req.ip;
+
+  // Deteksi apakah perangkat jadul (Java, Symbian, Opera Mini, Nokia, UCWeb, dll)
+  const isOldPhone =
+    ua.includes("nokia") ||
+    ua.includes("symbian") ||
+    ua.includes("series40") ||
+    ua.includes("j2me") ||
+    ua.includes("midp") ||
+    ua.includes("opera mini") ||
+    ua.includes("ucweb") ||
+    ua.includes("samsungbrowser/1") ||
+    ua.includes("mot") ||
+    ua.includes("sonyericsson");
+
+  // Jika domain utama (repp.my.id), pastikan selalu HTTPS
+  if (host === "repp.my.id" && proto === "http") {
+    writeRedirectLog(`Redirect: ${ip} → ${host}${req.originalUrl} | UA: ${ua}`);
+    return res.redirect(301, `https://${host}${req.originalUrl}`);
+  }
+
+  // Jika domain java.repp.my.id tapi bukan perangkat jadul → wajib HTTPS
+  if (host === "java.repp.my.id" && proto === "http" && !isOldPhone) {
+    writeRedirectLog(`Redirect: ${ip} → ${host}${req.originalUrl} | UA: ${ua}`);
+    return res.redirect(301, `https://${host}${req.originalUrl}`);
+  }
+
+  // Jika perangkat jadul atau sudah HTTPS → lanjut
+  next();
+});
 
 import fs from "fs"; // di bagian atas
 const gamesFilePath = path.join(__dirname, "games.json"); // atau "./backend/games.json" sesuai letaknya
